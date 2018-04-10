@@ -15,8 +15,10 @@
 
 
 ##### JStore
-    initValue only condition check `if` operator
-    clone with last value only if jstore has config property initial value
+    - initValue only condition check `if` operator
+    - clone with last value only if jstore has config property initial value
+    - formatters run with priority by index ( prev value passed to next formatter )
+      return last formatted value
 
 
 

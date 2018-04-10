@@ -91,7 +91,11 @@ const storeNumberStrict = new JStore<any>({
 storeNumberStrict.dispatch('Hello, World!');
 
 // error if initValue type string
-storeNumberStrict.dispatch(1123);
+try {
+  storeNumberStrict.dispatch(1123);
+} catch (e) {
+  console.log(e);
+}
 
 // check after store initial
 // error, prev type not equals to current
