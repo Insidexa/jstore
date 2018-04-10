@@ -13,6 +13,10 @@
  - Actions
 
 
+#### Examples
+    src/main.ts - JStore
+    src/dispatcher.ts - JStoreDispatcher
+
 
 ##### JStore
     - initValue only condition check `if` operator
