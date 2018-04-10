@@ -50,15 +50,15 @@ export const testDispatcher = () => {
   });
 
 // listener by name
-  dispatcher.on('minus', (value: number, destroyFn: () => void) => {
-    console.log('on action {minus}: ', actionDec, value);
+  dispatcher.on('dec', (value: number, destroyFn: () => void) => {
+    console.log('on action {dec}: ', actionDec, value);
     destroyFn();
   });
 
 // snapshot with history & store, date, name
   const snapshot1 = dispatcher.makeSnapshot('three');
 
-  dispatcher.action('minus', 4);
+  dispatcher.action('dec', 4);
 
 // restore snapshot with history, value
   dispatcher.restoreSnapshot(snapshot1);
