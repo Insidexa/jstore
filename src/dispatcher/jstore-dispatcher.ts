@@ -17,7 +17,7 @@ type DestroyFn<T> = (value: T, destroy: () => void) => void;
  *
  * TODO: add filters for collection store
  *
- * TODO: replace on to middleware with ( before and after )
+ * TODO: add middleware with ( before and after )
  *       before maybe with result: boolean
  *       before maybe pass value in action
  *       false -> action not called
