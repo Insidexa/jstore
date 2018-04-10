@@ -22,7 +22,7 @@
 
 
 ### ROADMAP
- - JStore: add middlewares  
+ - JStoreDispatcher: add middlewares  
 
 
 ### For development
