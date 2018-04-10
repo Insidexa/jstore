@@ -1,6 +1,8 @@
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
+import { switchMap, mergeScan, last } from 'rxjs/operators';
+import { of } from 'rxjs/observable/of';
 
 import { StorageInterface } from './storage/storage.interface';
 import { SimpleStorage } from './storage/simple.storage';
@@ -9,8 +11,6 @@ import { FormatterInterface } from './formatter/formatter.interface';
 import { StrictTypeException } from './exceptions/strict-type.exception';
 import { JStoreConfResolver } from './config-resolver';
 import { getType } from './get-type';
-import { map, concatMap, switchMap, mergeScan, last, combineAll } from 'rxjs/operators';
-import { of } from 'rxjs/observable/of';
 
 export class JStore<T> {
   private store: Subject<T> = new Subject<T>();
@@ -23,6 +23,7 @@ export class JStore<T> {
 
   private strict: boolean = true;
   private prevType: string;
+  private prevValue: T;
 
   constructor(private config?: StoreConfigInterface<T>) {
     if (config) {
@@ -39,6 +40,7 @@ export class JStore<T> {
       this.outputFormatters = outputFormatters;
       this.strict = strictTypeCheck;
       if (initValue) {
+        this.prevValue = initValue;
         this.prevType = getType(initValue);
         this.dispatch(initValue);
       }
@@ -57,7 +59,7 @@ export class JStore<T> {
     const inputFormatters = this.inputFormatters;
     const outputFormatters = this.outputFormatters;
     const strictTypeCheck = this.strict;
-    const initValue = this.storage.cachedValue();
+    const initValue = this.config && this.config.initValue ? this.prevValue : null;
 
     let config: StoreConfigInterface<T> = {
       storage,
@@ -93,6 +95,7 @@ export class JStore<T> {
       return this.storage.set(formattedValue)
         .subscribe((storeValue: T) => {
           this.prevType = type;
+          this.prevValue = storeValue;
           this.store.next(storeValue);
 
           return storeValue;

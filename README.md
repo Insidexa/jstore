@@ -2,7 +2,8 @@
 
 #### JStore
  - Actions & Formatters
- - Custom input & output formatters
+ - Initial value
+ - Custom input & output formatters ( Formatters are Observable )
  - Custom storage
  - Strict storage checking
 
@@ -11,6 +12,11 @@
  - Snapshots
  - Actions
 
+
+
+##### JStore
+    initValue only condition check `if` operator
+    clone with last value only if jstore has config property initial value
 
 
 ### For development

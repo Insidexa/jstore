@@ -19,8 +19,4 @@ export class SimpleStorage<T> implements StorageInterface<T> {
     return Observable.of(this.value);
   }
 
-  public cachedValue(): T {
-    return this.value;
-  }
-
 }
