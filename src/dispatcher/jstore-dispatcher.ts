@@ -23,11 +23,6 @@ type DestroyFn<T> = (value: T, destroy: () => void) => void;
  *       false -> action not called
  *       true -> called
  *
- * TODO: add named subscription
- *       example:
- *         dispatcher.add('listenerInComponent') // for what
- *         dispatcher.makeSub('listenerInComponent').subscribe....
- *         dispatcher.completeSub('listenerInComponent')
  */
 export class JStoreDispatcher<T> {
 
