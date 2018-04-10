@@ -19,6 +19,12 @@
     clone with last value only if jstore has config property initial value
 
 
+
+
+### ROADMAP
+ - JStore: add middlewares  
+
+
 ### For development
 ###### Переходим в директорию с проектом
 ```bash
