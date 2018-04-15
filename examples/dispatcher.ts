@@ -73,26 +73,26 @@ export const testDispatcher = () => {
     console.log('storeNumber1', value);
   });
 
-  const d1 = new JStoreDispatcher(storeNumber1);
+  const dispatcher1 = new JStoreDispatcher(storeNumber1);
   console.info('restore from snapshot1');
 
 // restoring from another store
-  d1.restoreSnapshot(snapshot1);
+  dispatcher1.restoreSnapshot(snapshot1);
 
 // lock dispatcher, another actions disable, throw error
-  console.log('lock d1');
-  d1.lock();
+  console.log('lock dispatcher1');
+  dispatcher1.lock();
 
   try {
     // error
-    d1.action(actionInc);
+    dispatcher1.action(actionInc);
   } catch (e) {
     console.log(e);
   }
 
 // unlock, try to unlock two or more - error
-  d1.unlock();
-  d1.action(actionInc);
+  dispatcher1.unlock();
+  dispatcher1.action(actionInc);
 
   console.groupEnd();
 };

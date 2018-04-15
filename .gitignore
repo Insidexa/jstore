@@ -4,6 +4,7 @@ bundle/**/*
 examples/dist/**/*
 src/**/*.js
 src/**/*.js.map
+*.tgz
 typings
 dist
 coverage
