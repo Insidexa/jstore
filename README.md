@@ -15,8 +15,10 @@
 
 
 #### Examples
-    dev/main.ts - JStore
-    dev/dispatcher.ts - JStoreDispatcher
+    examples/main.ts - JStore
+    examples/dispatcher.ts - JStoreDispatcher
+    examples/stores - How create custom store
+    examples/formatters - How create formatter
 
 
 ##### JStore
