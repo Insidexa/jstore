@@ -1,18 +1,19 @@
 const path = require('path');
 const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const ROOT = path.resolve( __dirname, 'src' );
-const DESTINATION = path.resolve( __dirname, 'bundle' );
+const ROOT = path.resolve( __dirname, 'dev' );
+const DESTINATION = path.resolve( ROOT, 'dist' );
 const exclude = [
     path.resolve( __dirname, 'node_modules' ),
-    path.resolve( __dirname, 'dev' ),
+    path.resolve( __dirname, 'bundle' ),
 ];
 
 module.exports = {
     context: ROOT,
 
     entry: {
-        'bundle': './index.ts'
+        'main': './main.ts'
     },
     
     output: {
@@ -35,6 +36,11 @@ module.exports = {
             *****************/
             {
                 enforce: 'pre',
+                test: /\.js$/,
+                use: 'source-map-loader'
+            },
+            {
+                enforce: 'pre',
                 test: /\.ts$/,
                 exclude: exclude,
                 use: 'tslint-loader'
@@ -46,16 +52,23 @@ module.exports = {
             {
                 test: /\.ts$/,
                 exclude: exclude,
-                use: 'awesome-typescript-loader?tsconfig=tsconfig.json'
+                use: {
+                    loader: 'awesome-typescript-loader',
+                    options: {
+                        configFileName: 'tsconfig-dev.json'
+                    }
+                }
             }
         ]
     },
 
     plugins: [
-
+	    new HtmlWebpackPlugin({
+	      template: 'index.html'
+	    })
     ],
 
-    devtool: 'none',
+    devtool: 'cheap-module-source-map',
     devServer: {}
 };
 

@@ -1,31 +1,20 @@
 import { Observable } from 'rxjs/Observable';
+import { of } from 'rxjs/observable/of';
 
-export class Middleware {
-  protected name: string = null;
-  protected beforeFn: any = null;
-  protected afterFn: any = null;
+export interface MiddlewareInterface<T> {
+  next(): Observable<T>;
 
-  public changeName(name: string) {
-    this.name = name;
-  }
+  getName(): string;
+}
 
-  public before(fn: Function) {
-    this.beforeFn = fn;
-  }
-
-  public after(fn: Function) {
-    this.afterFn = fn;
-  }
+export class Middleware<T> implements MiddlewareInterface<T> {
+  public constructor(private readonly name: string) {}
 
   public getName(): string {
     return this.name;
   }
 
-  public getAfter(): Function {
-    return this.afterFn;
-  }
-
-  public getBefore(): Function {
-    return this.afterFn;
+  public next(): Observable<T> {
+    return of();
   }
 }

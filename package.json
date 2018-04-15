@@ -2,12 +2,11 @@
   "name": "JashkaStore",
   "version": "0.0.1",
   "description": "Simple, flexible, reactive store",
-  "main": "index.js",
+  "main": "bundle/bundle.js",
+  "types": "bundle/bundle.d.ts",
   "scripts": {
-    "serve": "./node_modules/.bin/webpack-dev-server --mode development --open --port 8000 --inline --hot --progress --profile --colors --watch --content-base dist/",
-    "build": "./node_modules/.bin/webpack --mode development --watch",
-    "build:prod": "./node_modules/.bin/cross-env NODE_ENV=production webpack --mode production",
-    "webpack": "./node_modules/.bin/webpack --inline --progress --profile --colors"
+    "serve": "./node_modules/.bin/webpack-dev-server --config webpack.config-dev.js --mode development --profile --open --port 8000 --inline --hot --progress --profile --colors --watch --content-base dev/dist/",
+    "build": "./node_modules/.bin/cross-env NODE_ENV=production webpack --mode production"
   },
   "keywords": [
     "webpack",

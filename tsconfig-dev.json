@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "outDir": "./dev/dist/",
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "module": "commonjs",
+    "lib": [ "es2015", "dom" ],
+    "target": "es5",
+    "allowJS": true
+  },
+  "exclude": [
+    "bundle/**/*",
+    "dev/dist/**/*"
+  ]
+}

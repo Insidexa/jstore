@@ -1,15 +1,15 @@
 import { Observable } from 'rxjs/Observable';
+import { map } from 'rxjs/operators';
 
-import { JStore } from '../store/jstore';
+import { $$storage, JStore } from '../store/jstore';
 import { Snapshot } from './snapshot/snapshot';
 import { ActionInterface } from './action/action.interface';
 import { ActionEventInterface } from './action/action-event.interface';
-import { Action } from './action/action';
+import { Action, ActionFn } from './action/action';
 import { Snapshoter } from './snapshot/snapshoter';
 import { JStoreDispatcherError } from './dispatcher-locked.error';
 import { ReactionDataInterface } from './reaction-data.interface';
 
-type JSDAction<T> = string | Action<T>;
 type DestroyFn<T> = (value: T, destroy: () => void) => void;
 
 /**
@@ -17,7 +17,7 @@ type DestroyFn<T> = (value: T, destroy: () => void) => void;
  *
  * TODO: add filters for collection store
  *
- * TODO: add middleware with ( before and after )
+ * TODO: add middleware with before
  *       before maybe with result: boolean
  *       before maybe pass value in action
  *       false -> action not called
@@ -34,55 +34,37 @@ export class JStoreDispatcher<T> {
   private NAME_LOCK: string = 'LOCK_ACTION$';
   private NAME_UNLOCK: string = 'UNLOCK_ACTION$';
 
-  constructor(private store: JStore<T>) {}
+  constructor(private store?: JStore<T>) {
+    if (!this.store) {
+      this.store = new JStore<T>();
+    }
+  }
 
-  public action(action: JSDAction<T>, value?: T): JStoreDispatcher<T> {
+  public action(action: Action<T>): JStoreDispatcher<T> {
     if (this.isLock) {
       throw new JStoreDispatcherError('Dispatcher locked. Unlock to continue');
     }
 
-    switch (typeof action) {
-      case 'string':
-        const actionName = <string>action;
-        const data = this.actionFromName(actionName, value);
+    this.runAction(action)
+      .subscribe((data: ReactionDataInterface<T>) => {
         this.pushReactions(data);
-        break;
-      case 'object':
-        this.actionFromObject(<Action<T>>action)
-          .subscribe((data: ReactionDataInterface<T>) => {
-            this.pushReactions(data);
-          })
-          .unsubscribe();
-
-        break;
-    }
+      })
+      .unsubscribe();
 
     return this;
   }
 
-  public on(action: JSDAction<T>, fn: DestroyFn<T>): JStoreDispatcher<T> {
-    switch (typeof action) {
-      case 'string':
-        const name = <string>action;
-        this.actionEvents.push({
-          name: name,
-          fn: fn.bind(this)
-        });
-        break;
-
-      case 'object':
-        this.actionEvents.push({
-          name: (action as Action<T>).name,
-          fn: fn.bind(this)
-        });
-        break;
-    }
+  public on(action: Action<T>, fn: DestroyFn<T>): JStoreDispatcher<T> {
+    this.actionEvents.push({
+      name: action.name,
+      fn: fn.bind(this)
+    });
 
     return this;
   }
 
-  public restoreSnapshot(snapshotNameObject: string | Snapshot<T>): Snapshot<T> {
-    const snapshot = this.snapshoter.restore(snapshotNameObject);
+  public restoreSnapshot(snapshotObject: Snapshot<T>): Snapshot<T> {
+    const snapshot = this.snapshoter.restore(snapshotObject);
     const actions = snapshot.getActions();
     actions.forEach((action: ActionInterface<T>) => {
       this.actions.push(action);
@@ -103,7 +85,7 @@ export class JStoreDispatcher<T> {
     return snapshot;
   }
 
-  public clearSnapshots(snapshot?: string | Snapshot<T>): JStoreDispatcher<T> {
+  public clearSnapshots(snapshot?: Snapshot<T>): JStoreDispatcher<T> {
     this.snapshoter.clear(snapshot);
 
     return this;
@@ -140,6 +122,13 @@ export class JStoreDispatcher<T> {
     return this.isLock;
   }
 
+  public static makeAction<T>(name: string, fn: ActionFn<T>): Action<T> {
+    return {
+      name,
+      fn
+    };
+  }
+
   private pushReactions(data: ReactionDataInterface<T>): void {
     const length = this.actionEvents.length;
     for (let i = 0; i < length; ++i) {
@@ -152,21 +141,14 @@ export class JStoreDispatcher<T> {
     }
   }
 
-  private actionFromName(name: string, value: T): ReactionDataInterface<T> {
-    const action = {name, value};
-    this.actions.push(action);
-    this.store.dispatch(value);
+  private runAction(action: Action<T>): Observable<ReactionDataInterface<T>> {
+    return (this.store[$$storage]() as Observable<T>)
+      .pipe(map((value: T) => {
+        value = action.fn.bind(this)(value);
+        this.store.dispatch(value);
+        const name = action.name;
 
-    return {name, value};
-  }
-
-  private actionFromObject(action: Action<T>): Observable<ReactionDataInterface<T>> {
-    return this.store.getStorage().map((value: T) => {
-      value = action.fn.bind(this)(value);
-      this.store.dispatch(value);
-      const name = action.name;
-
-      return {name, value};
-    });
+        return {name, value};
+      }));
   }
 }

@@ -1,8 +1,14 @@
-import { FormatterInterface } from './formatter.interface';
+import { of } from 'rxjs/observable/of';
 import { Observable } from 'rxjs/Observable';
+import { map } from 'rxjs/operators';
+
+import { FormatterInterface } from './formatter.interface';
 
 export class JSONToStringFormatter implements FormatterInterface {
   public transform(json: any): Observable<string> {
-    return Observable.of(JSON.stringify(json));
+    return of(json)
+      .pipe(
+        map(json => JSON.stringify(json))
+      );
   }
 }

@@ -1,10 +1,11 @@
-import { ToNumberFormatter } from './store/formatter/to-number.formatter';
-import { ToStringFormatter } from './store/formatter/to-string.formatter';
-import { LocalStorage } from './store/storage/localstorage.store';
-import { JStore } from './store/jstore';
-import { JStoreDispatcher } from './dispatcher/jstore-dispatcher';
-import { makeAction } from './dispatcher/action/make-action';
+import {
+  ToNumberFormatter,
+  ToStringFormatter,
+  JStore,
+  JStoreDispatcher
+} from '../src/index';
 
+import { LocalStorage } from './localstorage.store';
 
 export const testDispatcher = () => {
   const storeNumber = new JStore<number>({
@@ -17,16 +18,16 @@ export const testDispatcher = () => {
     ]
   });
 
-  const subscriptionNumber = storeNumber.value().subscribe((value: number) => {
+  const subscriptionNumber = storeNumber.subscribe((value: number) => {
     console.log('storeNumber', value);
   });
 
   storeNumber.dispatch(1);
 
-// destroy subscription (subscriptionNumber) and observable call complete
-// storeNumber.destroy(subscriptionNumber);
+  // destroy subscription (subscriptionNumber) and observable call complete
+  storeNumber.destroy(subscriptionNumber);
 
-// not work
+  // not work
   storeNumber.dispatch(2);
 
 
@@ -36,11 +37,9 @@ export const testDispatcher = () => {
   const dispatcher = new JStoreDispatcher(storeNumber);
 
 // named action with state, saved in history
-  dispatcher.action('add', 3);
-
 // action as function
-  const actionInc = makeAction<number>('inc', (value: number) => value + 1);
-  const actionDec = makeAction<number>('dec', (value: number) => value - 1);
+  const actionInc = JStoreDispatcher.makeAction<number>('inc', (value: number) => value + 1);
+  const actionDec = JStoreDispatcher.makeAction<number>('dec', (value: number) => value - 1);
 
 // listener on action by action function
   dispatcher.on(actionInc, (value: number, destroyFn: () => void) => {
@@ -50,7 +49,7 @@ export const testDispatcher = () => {
   });
 
 // listener by name
-  dispatcher.on('dec', (value: number, destroyFn: () => void) => {
+  dispatcher.on(actionDec, (value: number, destroyFn: () => void) => {
     console.log('on action {dec}: ', actionDec, value);
     destroyFn();
   });
@@ -58,18 +57,17 @@ export const testDispatcher = () => {
 // snapshot with history & store, date, name
   const snapshot1 = dispatcher.makeSnapshot('three');
 
-  dispatcher.action('dec', 4);
-
 // restore snapshot with history, value
   dispatcher.restoreSnapshot(snapshot1);
 
   dispatcher.action(actionInc);
+
   dispatcher.action(actionDec);
 
 
   console.info('\nnew store');
   const storeNumber1 = new JStore<number>();
-  storeNumber1.value().subscribe((value: number) => {
+  storeNumber1.subscribe((value: number) => {
     console.log('storeNumber1', value);
   });
 

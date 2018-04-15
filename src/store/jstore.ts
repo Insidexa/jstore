@@ -11,6 +11,10 @@ import { FormatterInterface } from './formatter/formatter.interface';
 import { StrictTypeException } from './exceptions/strict-type.exception';
 import { JStoreConfResolver } from './config-resolver';
 import { getType } from './get-type';
+import { RunContext } from './run-context';
+
+export const $$storage = Symbol('$$storage');
+export const $$clone = Symbol('$$clone');
 
 export class JStore<T> {
   private store: Subject<T> = new Subject<T>();
@@ -24,6 +28,8 @@ export class JStore<T> {
   private strict: boolean = true;
   private prevType: string;
   private prevValue: T;
+
+  private context: RunContext = null;
 
   constructor(private config?: StoreConfigInterface<T>) {
     if (config) {
@@ -47,41 +53,16 @@ export class JStore<T> {
     }
   }
 
-  /**
-   * Ony for JStoreDispatcher
-   *
-   * @return {JStore<T>}
-   */
-  public clone(): JStore<T> {
-    const prototype = Object.getPrototypeOf(this.storage);
-    const store = Object.create(prototype);
-    const storage = Object.assign(store, this.storage);
-    const inputFormatters = this.inputFormatters;
-    const outputFormatters = this.outputFormatters;
-    const strictTypeCheck = this.strict;
-    const initValue = this.config && this.config.initValue ? this.prevValue : null;
+  public changeContext(context: RunContext): JStore<T> {
+    this.context = context;
 
-    let config: StoreConfigInterface<T> = {
-      storage,
-      inputFormatters,
-      outputFormatters,
-      strictTypeCheck
-    };
-
-    if (initValue) {
-      config.initValue = initValue;
-    }
-
-    return new JStore<T>(config);
+    return this;
   }
 
-  public check(): Subscription {
-    return this.storage.get()
-      .subscribe((value: T) => {
-        this.store.next(value);
-
-        return value;
-      });
+  public observable(): Observable<T> {
+    return this.store$.pipe(
+      switchMap(this.checkOutputFormatters.bind(this))
+    );
   }
 
   public dispatch(value: T): Subscription {
@@ -96,24 +77,16 @@ export class JStore<T> {
         .subscribe((storeValue: T) => {
           this.prevType = type;
           this.prevValue = storeValue;
-          this.store.next(storeValue);
+          this.runMaybeWithContext(storeValue);
 
           return storeValue;
         });
     });
   }
 
-  public getStorage(): Observable<T> {
-    return this.storage.get()
-      .pipe(
-        switchMap(this.checkOutputFormatters.bind(this))
-      );
-  }
-
-  public value(): Observable<T> {
-    return this.store$.pipe(
-      switchMap(this.checkOutputFormatters.bind(this))
-    );
+  public subscribe(next?: (value: T) => void, error?: (error: any) => void, complete?: () => void): Subscription {
+    return this.observable()
+      .subscribe(next, error, complete);
   }
 
   public destroy(subscription?: Subscription): void {
@@ -139,6 +112,39 @@ export class JStore<T> {
     return this;
   }
 
+  /**
+   * Ony for JStoreDispatcher
+   *
+   */
+  public [$$clone](): JStore<T> {
+    const prototype = Object.getPrototypeOf(this.storage);
+    const store = Object.create(prototype);
+    const storage = Object.assign(store, this.storage);
+    const inputFormatters = this.inputFormatters;
+    const outputFormatters = this.outputFormatters;
+    const strictTypeCheck = this.strict;
+    const initValue = this.config && this.config.initValue ? this.prevValue : null;
+
+    let config: StoreConfigInterface<T> = {
+      storage,
+      inputFormatters,
+      outputFormatters,
+      strictTypeCheck
+    };
+
+    if (initValue) {
+      config.initValue = initValue;
+    }
+
+    return new JStore<T>(config);
+  }
+
+  public [$$storage](): Observable<T> {
+    return this.storage.get()
+      .pipe(
+        switchMap(this.checkOutputFormatters.bind(this))
+      );
+  }
 
   private checkInputFormatters(value: T): Observable<T> {
     return this.formatValue(this.inputFormatters, value);
@@ -148,15 +154,23 @@ export class JStore<T> {
     return this.formatValue(this.outputFormatters, value);
   }
 
-  private formatValue(formatters: FormatterInterface[], value: T): any {
+  private formatValue(formatters: FormatterInterface[], value: T): Observable<T> {
     if (formatters.length === 0) {
-      return Observable.of(value);
+      return of(value);
     }
 
     return of(...formatters)
       .pipe(
-        mergeScan((value: any, formatter: any) => (formatter as FormatterInterface).transform(value), value),
+        mergeScan((value: T, formatter: FormatterInterface) => formatter.transform(value), value),
         last()
       );
+  }
+
+  private runMaybeWithContext(value: T) {
+    if (this.context) {
+      this.context(() => this.store.next(value));
+    } else {
+      this.store.next(value);
+    }
   }
 }

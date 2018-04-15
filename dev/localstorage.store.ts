@@ -1,23 +1,24 @@
-import { Observable } from 'rxjs';
+import { of } from 'rxjs/observable/of';
+import { Observable } from 'rxjs/Observable';
 
-import { StorageInterface } from './storage.interface';
+import { StorageInterface } from '../src/index';
 
 export class LocalStorage<T> implements StorageInterface<T> {
   constructor(private token: string = 'store') {
   }
 
   public get(): Observable<any> {
-    return Observable.of(localStorage.getItem(this.token));
+    return of(localStorage.getItem(this.token));
   }
 
   public set(value: any): Observable<T | null> {
     localStorage.setItem(this.token, value);
-    return Observable.of(value);
+    return of(value);
   }
 
   public clear(): Observable<T | null> {
     localStorage.removeItem(this.token);
-    return Observable.of(null);
+    return of(null);
   }
 
 }

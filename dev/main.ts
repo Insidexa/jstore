@@ -1,22 +1,32 @@
-import { JStore } from './store/jstore';
-import { LocalStorage } from './store/storage/localstorage.store';
-import { storeFactory } from './store/store.factory';
-import { TrimFormatter } from './store/formatter/trim.formatter';
-import { StringToJSONFormatter } from './store/formatter/string-to-json.formatter';
-import { JSONToStringFormatter } from './store/formatter/json-to-string.formatter';
-import { testDispatcher } from './dispatcher';
+import { forkJoin } from 'rxjs/observable/forkJoin';
 
+import {
+  JStore,
+  storeFactory,
+  TrimFormatter,
+  StringToJSONFormatter,
+  JSONToStringFormatter
+} from '../src/index';
+
+import { LocalStorage } from './localstorage.store';
+import { testDispatcher } from './dispatcher';
 
 /**
  * store factory
  */
 const st = storeFactory<number>();
-const scSt = st.value().subscribe((n: number) => {
+const scSt = st.subscribe((n: number) => {
   console.log('n', n);
 });
+st.changeContext((fn) => {
+  function $scopeApply(fn: Function) {
+    console.log(`example, run in 'angular context'`);
+    fn();
+  }
+
+  $scopeApply(fn);
+});
 st.dispatch(100000000);
-// complete store & unsubscribe onChange
-st.destroy(scSt);
 
 
 /**
@@ -30,16 +40,25 @@ const storeString = new JStore<string>({
   ]
 });
 
-const subscriptionString = storeString.value().subscribe((value: string) => {
-  console.log('storeString', value);
+const subscriptionString = storeString.subscribe((value: string) => {
+  console.log('storeString', `'${value}'`);
 });
 
 storeString.dispatch('a    ');
 storeString.dispatch('     b');
 storeString.dispatch('ac c');
 storeString.dispatch('asd');
+
+
+forkJoin([st.observable(), storeString.observable()]).subscribe(v => {
+  console.log('forkJoin', v);
+});
+
+st.dispatch(11);
 storeString.dispatch('    asdasd asd asd ');
 
+// complete store & unsubscribe onChange
+st.destroy(scSt);
 storeString.destroy(subscriptionString);
 
 
@@ -47,6 +66,7 @@ storeString.destroy(subscriptionString);
  * Custom object with localstorage
  * format json to str and str to json
  */
+
 interface CustomObject {
   name: string;
   id: number;
@@ -63,7 +83,7 @@ const storeLocalStorage = new JStore<CustomObject>({
   ]
 });
 
-const subscriptionLocalStorage = storeLocalStorage.value().subscribe((value: CustomObject) => {
+const subscriptionLocalStorage = storeLocalStorage.subscribe((value: CustomObject) => {
   console.log('storeLocalStorage', value);
 });
 
