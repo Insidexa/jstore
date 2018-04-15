@@ -24,6 +24,14 @@
     - clone with last value only if jstore has config property initial value
     - formatters run with priority by index ( prev value passed to next formatter )
       return last formatted value
+      
+    - Base:
+        formatters:
+            - to number
+            - to string
+            - trim
+        storage:
+            - simple storage ( in memory )
 
 
 

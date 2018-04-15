@@ -6,11 +6,15 @@
   "types": "bundle/bundle.d.ts",
   "scripts": {
     "serve": "./node_modules/.bin/webpack-dev-server --config webpack.config-dev.js --mode development --profile --open --port 8000 --inline --hot --progress --profile --colors --watch --content-base examples/",
-    "build": "./node_modules/.bin/cross-env NODE_ENV=production webpack --mode production"
+    "build": "./node_modules/.bin/cross-env NODE_ENV=production webpack --mode production",
+    "publish": "npm run build && npm publish ./bundle",
+    "lib": "npm run build && npm pack ./bundle"
   },
   "keywords": [
-    "webpack",
-    "typescript"
+    "store",
+    "jashkasoft",
+    "rxjs",
+    "reactive store"
   ],
   "author": "JashkaSoft",
   "license": "ISC",

@@ -4,11 +4,11 @@ import {
   JStore,
   storeFactory,
   TrimFormatter,
-  StringToJSONFormatter,
-  JSONToStringFormatter
 } from '../src/index';
 
 import { LocalStorage } from './stores/localstorage.store';
+import { JSONToStringFormatter } from './formatters/json-to-string.formatter';
+import { StringToJSONFormatter } from './formatters/string-to-json.formatter';
 import { testDispatcher } from './dispatcher';
 
 

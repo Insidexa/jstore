@@ -1,7 +1,7 @@
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import { Observable } from 'rxjs/Observable';
 
-import { StorageInterface } from './storage.interface';
+import { StorageInterface } from '../../src/store/storage/storage.interface';
 
 /**
  * Http storage created with promises for sync with backend

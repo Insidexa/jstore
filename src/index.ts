@@ -9,13 +9,10 @@ export { ReactionDataInterface } from './dispatcher/reaction-data.interface';
 
 export { StrictTypeException } from './store/exceptions/strict-type.exception';
 export { FormatterInterface } from './store/formatter/formatter.interface';
-export { JSONToStringFormatter } from './store/formatter/json-to-string.formatter';
-export { StringToJSONFormatter } from './store/formatter/string-to-json.formatter';
 export { ToNumberFormatter } from './store/formatter/to-number.formatter';
 export { ToStringFormatter } from './store/formatter/to-string.formatter';
 export { TrimFormatter } from './store/formatter/trim.formatter';
 
-export { HttpStorage } from './store/storage/http.storage';
 export { SimpleStorage } from './store/storage/simple.storage';
 export { StorageInterface } from './store/storage/storage.interface';
 
