@@ -14,8 +14,8 @@
 
 
 #### Examples
-    src/main.ts - JStore
-    src/dispatcher.ts - JStoreDispatcher
+    dev/main.ts - JStore
+    dev/dispatcher.ts - JStoreDispatcher
 
 
 ##### JStore
@@ -44,15 +44,10 @@ npm i
 
 ###### Запуск сборки приложения и веб-сервера:
 ```bash
-npm serve
-```
-
-###### Сборка приложения без минификации: 
-```bash
-npm run build
+npm run serve
 ```
 
 ###### Сборка приложения с минификацией: 
 ```bash
-npm run build:prod
+npm run build
 ```
