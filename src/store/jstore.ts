@@ -100,18 +100,6 @@ export class JStore<T> {
       .unsubscribe();
   }
 
-  public setInputFormatters(formatters: FormatterInterface[]): JStore<T> {
-    this.inputFormatters = formatters;
-
-    return this;
-  }
-
-  public setOutputFormatters(formatters: FormatterInterface[]): JStore<T> {
-    this.outputFormatters = formatters;
-
-    return this;
-  }
-
   /**
    * Ony for JStoreDispatcher
    *
