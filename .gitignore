@@ -1,7 +1,7 @@
 .idea
 node_modules
 bundle/**/*
-dev/dist/**/*
+examples/dist/**/*
 src/**/*.js
 src/**/*.js.map
 typings

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./dev/dist/",
+    "outDir": "./examples/dist/",
     "sourceMap": true,
     "noImplicitAny": true,
     "module": "commonjs",
@@ -10,6 +10,6 @@
   },
   "exclude": [
     "bundle/**/*",
-    "dev/dist/**/*"
+    "examples/dist/**/*"
   ]
 }

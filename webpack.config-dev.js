@@ -2,7 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const ROOT = path.resolve( __dirname, 'dev' );
+const ROOT = path.resolve( __dirname, 'examples' );
 const DESTINATION = path.resolve( ROOT, 'dist' );
 const exclude = [
     path.resolve( __dirname, 'node_modules' ),
