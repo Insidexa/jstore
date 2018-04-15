@@ -1,7 +1,7 @@
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
-import { switchMap, mergeScan, last } from 'rxjs/operators';
+import { switchMap, mergeScan, last, map } from 'rxjs/operators';
 import { of } from 'rxjs/observable/of';
 
 import { StorageInterface } from './storage/storage.interface';
@@ -12,6 +12,7 @@ import { StrictTypeException } from './exceptions/strict-type.exception';
 import { JStoreConfResolver } from './config-resolver';
 import { getType } from './get-type';
 import { RunContext } from './run-context';
+import { observable } from 'rxjs/symbol/observable';
 
 export const $$storage = Symbol('$$storage');
 export const $$clone = Symbol('$$clone');
@@ -78,8 +79,6 @@ export class JStore<T> {
           this.prevType = type;
           this.prevValue = storeValue;
           this.runMaybeWithContext(storeValue);
-
-          return storeValue;
         });
     });
   }
