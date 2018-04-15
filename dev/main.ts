@@ -17,11 +17,11 @@ function example_storeFactory_context_number() {
   /**
    * store factory
    */
-  const st = storeFactory<number>();
-  const scSt = st.subscribe((n: number) => {
+  const store = storeFactory<number>();
+  const sub = store.subscribe((n: number) => {
     console.log('number', n);
   });
-  st.changeContext((fn) => {
+  store.changeContext((fn) => {
     function $scopeApply(fn: Function) {
       console.log(`example, run in 'angular context'`);
       fn();
@@ -29,8 +29,8 @@ function example_storeFactory_context_number() {
 
     $scopeApply(fn);
   });
-  st.dispatch(100000000);
-  st.destroy(scSt);
+  store.dispatch(100000000);
+  store.destroy(sub);
 
   console.groupEnd();
 }
