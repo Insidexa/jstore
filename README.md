@@ -6,6 +6,7 @@
  - Custom input & output formatters ( Formatters are Observable )
  - Custom storage
  - Strict storage checking
+ - context run ( maybe with angularjs $scopeApply )
 
 #### JStoreDispatcher over JStore
  - Lock & unlock

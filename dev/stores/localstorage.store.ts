@@ -1,7 +1,7 @@
 import { of } from 'rxjs/observable/of';
 import { Observable } from 'rxjs/Observable';
 
-import { StorageInterface } from '../src/index';
+import { StorageInterface } from '../../src/index';
 
 export class LocalStorage<T> implements StorageInterface<T> {
   constructor(private token: string = 'store') {

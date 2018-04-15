@@ -8,125 +8,166 @@ import {
   JSONToStringFormatter
 } from '../src/index';
 
-import { LocalStorage } from './localstorage.store';
+import { LocalStorage } from './stores/localstorage.store';
 import { testDispatcher } from './dispatcher';
 
-/**
- * store factory
- */
-const st = storeFactory<number>();
-const scSt = st.subscribe((n: number) => {
-  console.log('n', n);
-});
-st.changeContext((fn) => {
-  function $scopeApply(fn: Function) {
-    console.log(`example, run in 'angular context'`);
-    fn();
-  }
 
-  $scopeApply(fn);
-});
-st.dispatch(100000000);
+function example_storeFactory_context_number() {
+  console.group('Example: storeFactory, context with number');
+  /**
+   * store factory
+   */
+  const st = storeFactory<number>();
+  const scSt = st.subscribe((n: number) => {
+    console.log('number', n);
+  });
+  st.changeContext((fn) => {
+    function $scopeApply(fn: Function) {
+      console.log(`example, run in 'angular context'`);
+      fn();
+    }
 
+    $scopeApply(fn);
+  });
+  st.dispatch(100000000);
+  st.destroy(scSt);
 
-/**
- *
- * trim formatter & init value
- */
-const storeString = new JStore<string>({
-  initValue: '   asd asd        ',
-  inputFormatters: [
-    new TrimFormatter()
-  ]
-});
+  console.groupEnd();
+}
 
-const subscriptionString = storeString.subscribe((value: string) => {
-  console.log('storeString', `'${value}'`);
-});
+function example_initValue_formatters() {
+  console.group('Example: initValue string, formatters ( trim )');
+  /**
+   *
+   * trim formatter & init value
+   */
+  const storeString = new JStore<string>({
+    initValue: '   asd asd        ',
+    inputFormatters: [
+      new TrimFormatter()
+    ]
+  });
 
-storeString.dispatch('a    ');
-storeString.dispatch('     b');
-storeString.dispatch('ac c');
-storeString.dispatch('asd');
+  const subscriptionString = storeString.subscribe((value: string) => {
+    console.log('storeString', `'${value}'`);
+  });
 
-
-forkJoin([st.observable(), storeString.observable()]).subscribe(v => {
-  console.log('forkJoin', v);
-});
-
-st.dispatch(11);
-storeString.dispatch('    asdasd asd asd ');
+  storeString.dispatch('a    ');
+  storeString.dispatch('     b');
+  storeString.dispatch('ac c');
+  storeString.dispatch('asd');
+  storeString.dispatch('    asdasd asd asd ');
 
 // complete store & unsubscribe onChange
-st.destroy(scSt);
-storeString.destroy(subscriptionString);
-
-
-/**
- * Custom object with localstorage
- * format json to str and str to json
- */
-
-interface CustomObject {
-  name: string;
-  id: number;
+  storeString.destroy(subscriptionString);
+  console.groupEnd();
 }
 
-const storeLocalStorage = new JStore<CustomObject>({
-  // custom storage
-  storage: new LocalStorage<CustomObject>(),
-  inputFormatters: [
-    new JSONToStringFormatter()
-  ],
-  outputFormatters: [
-    new StringToJSONFormatter()
-  ]
-});
+function example_sessionStorage_formatter() {
+  /**
+   * Custom object with sessionstorage
+   * format json to str and str to json
+   */
+  console.group('Example: session storage, formatters ( to string, to object )');
+  interface CustomObject {
+    name: string;
+    id: number;
+  }
 
-const subscriptionLocalStorage = storeLocalStorage.subscribe((value: CustomObject) => {
-  console.log('storeLocalStorage', value);
-});
+  const storeSessionStorage = new JStore<CustomObject>({
+    // custom storage
+    storage: new LocalStorage<CustomObject>(),
+    inputFormatters: [
+      new JSONToStringFormatter()
+    ],
+    outputFormatters: [
+      new StringToJSONFormatter()
+    ]
+  });
 
-storeLocalStorage.dispatch({
-  name: 'name',
-  id: 2
-});
-storeLocalStorage.dispatch({
-  name: 'name1',
-  id: 2
-});
+  const subscriptionLocalStorage = storeSessionStorage.subscribe((value: CustomObject) => {
+    console.log('storeSessionStorage', value);
+  });
 
-storeLocalStorage.destroy(subscriptionLocalStorage);
+  storeSessionStorage.dispatch({
+    name: 'name',
+    id: 2
+  });
+  storeSessionStorage.dispatch({
+    name: 'name1',
+    id: 2
+  });
 
+  storeSessionStorage.destroy(subscriptionLocalStorage);
+  console.groupEnd();
+}
 
-/**
- * strict store
- */
-const storeNumberStrict = new JStore<any>({
-  strictTypeCheck: true,
-  initValue: '13'
-});
+function example_strictStore() {
+  /**
+   * strict store
+   */
+  console.group('Example: strict storage');
+  const storeNumberStrict = new JStore<any>({
+    strictTypeCheck: true,
+    initValue: '13'
+  });
 
 // ok, string type
-storeNumberStrict.dispatch('Hello, World!');
+  storeNumberStrict.dispatch('Hello, World!');
 
 // error if initValue type string
-try {
-  storeNumberStrict.dispatch(1123);
-} catch (e) {
-  console.log(e);
-}
+  try {
+    storeNumberStrict.dispatch(1123);
+  } catch (e) {
+    console.log(e);
+  }
 
 // check after store initial
 // error, prev type not equals to current
-try {
-  storeNumberStrict.dispatch('');
-} catch (e) {
-  console.error(e);
+  try {
+    storeNumberStrict.dispatch('');
+  } catch (e) {
+    console.error(e);
+  }
+  console.groupEnd();
 }
 
+function example_forkJoin() {
+  console.group('forkJoin');
 
-console.log('\n\n======================================');
-console.info(' TEST Dispatcher');
+  const storeNumber = storeFactory<number>();
+  const storeString = storeFactory<string>();
+
+  forkJoin([
+    storeNumber.observable(),
+    storeString.observable()
+  ]).subscribe(v => {
+    console.log('forkJoin result', v);
+  });
+
+  storeNumber.dispatch(100);
+  storeString.dispatch('hellooooooo');
+
+  storeNumber.destroy();
+  storeString.destroy();
+
+  console.groupEnd();
+}
+
+console.group('JStore');
+
+
+example_storeFactory_context_number();
+
+example_forkJoin();
+
+example_initValue_formatters();
+
+example_sessionStorage_formatter();
+
+example_strictStore();
+
+
+console.groupEnd();
 
 testDispatcher();

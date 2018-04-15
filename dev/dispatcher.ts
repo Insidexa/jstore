@@ -5,9 +5,11 @@ import {
   JStoreDispatcher
 } from '../src/index';
 
-import { LocalStorage } from './localstorage.store';
+import { LocalStorage } from './stores/localstorage.store';
 
 export const testDispatcher = () => {
+  console.group('JStoreDispatcher');
+
   const storeNumber = new JStore<number>({
     storage: new LocalStorage<number>('number'),
     inputFormatters: [
@@ -91,4 +93,6 @@ export const testDispatcher = () => {
 // unlock, try to unlock two or more - error
   d1.unlock();
   d1.action(actionInc);
+
+  console.groupEnd();
 };
