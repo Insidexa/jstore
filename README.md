@@ -50,15 +50,15 @@ cd folder-name
 
 ###### Установка зависимостей
 ```bash
-npm i
+yarn
 ```
 
 ###### Запуск сборки приложения и веб-сервера:
 ```bash
-npm run serve
+yarn run serve
 ```
 
 ###### Сборка приложения с минификацией: 
 ```bash
-npm run build
+yarn run build
 ```
