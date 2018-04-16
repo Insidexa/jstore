@@ -1,5 +1,6 @@
 import { Observable } from 'rxjs/Observable';
-import { map } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
+import { of } from 'rxjs/observable/of';
 
 import { $$storage, JStore } from '../store/jstore';
 import { Snapshot } from './snapshot/snapshot';
@@ -143,12 +144,21 @@ export class JStoreDispatcher<T> {
 
   private runAction(action: Action<T>): Observable<ReactionDataInterface<T>> {
     return (this.store[$$storage]() as Observable<T>)
-      .pipe(map((value: T) => {
-        value = action.fn.bind(this)(value);
-        this.store.dispatch(value);
-        const name = action.name;
+      .pipe(
+        map(value => action.fn.bind(this)(value)),
+        switchMap(observableOrValue => {
+          if (!(observableOrValue instanceof Observable)) {
+            return of(observableOrValue);
+          }
 
-        return {name, value};
-      }));
+          return observableOrValue;
+        }),
+        map((value: T) => {
+          this.store.dispatch(value);
+          const name = action.name;
+
+          return {name, value};
+        })
+      );
   }
 }

@@ -1,3 +1,5 @@
+import { of } from 'rxjs/observable/of';
+
 import {
   ToNumberFormatter,
   ToStringFormatter,
@@ -40,7 +42,7 @@ export const testDispatcher = () => {
 
 // named action with state, saved in history
 // action as function
-  const actionInc = JStoreDispatcher.makeAction<number>('inc', (value: number) => value + 1);
+  const actionInc = JStoreDispatcher.makeAction<number>('inc', (value: number) => of(value + 1));
   const actionDec = JStoreDispatcher.makeAction<number>('dec', (value: number) => value - 1);
 
 // listener on action by action function
@@ -50,7 +52,6 @@ export const testDispatcher = () => {
     destroyFn();
   });
 
-// listener by name
   dispatcher.on(actionDec, (value: number, destroyFn: () => void) => {
     console.log('on action {dec}: ', actionDec, value);
     destroyFn();
