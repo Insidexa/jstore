@@ -4,12 +4,10 @@ import { of } from 'rxjs/observable/of';
 
 import { $$storage, JStore } from '../store/jstore';
 import { Snapshot } from './snapshot/snapshot';
-import { ActionInterface } from './action/action.interface';
 import { ActionEventInterface } from './action/action-event.interface';
-import { Action, ActionFn } from './action/action';
+import { Action, ActionFn, ActionData } from './action/action';
 import { Snapshoter } from './snapshot/snapshoter';
 import { JStoreDispatcherError } from './dispatcher-locked.error';
-import { ReactionDataInterface } from './reaction-data.interface';
 
 type DestroyFn<T> = (value: T, destroy: () => void) => void;
 
@@ -28,12 +26,12 @@ type DestroyFn<T> = (value: T, destroy: () => void) => void;
 export class JStoreDispatcher<T> {
 
   private snapshoter: Snapshoter<T> = new Snapshoter<T>();
-  private actions: Array<ActionInterface<T>> = [];
+  private actionHistory: Array<Action<T>> = [];
+  private actionListeners: Array<ActionEventInterface<T>> = [];
   private isLock: boolean = false;
-  private actionEvents: Array<ActionEventInterface<T>> = [];
 
-  private NAME_LOCK: string = 'LOCK_ACTION$';
-  private NAME_UNLOCK: string = 'UNLOCK_ACTION$';
+  private LOCK_ACTION: Action<T> = JStoreDispatcher.makeAction<null>('LOCK_ACTION$', () => null);
+  private UNLOCK_ACTION: Action<T> = JStoreDispatcher.makeAction<null>('UNLOCK_ACTION$', () => null);
 
   constructor(private store?: JStore<T>) {
     if (!this.store) {
@@ -42,12 +40,11 @@ export class JStoreDispatcher<T> {
   }
 
   public action(action: Action<T>): JStoreDispatcher<T> {
-    if (this.isLock) {
-      throw new JStoreDispatcherError('Dispatcher locked. Unlock to continue');
-    }
+    this.throwIfLock();
 
     this.runAction(action)
-      .subscribe((data: ReactionDataInterface<T>) => {
+      .subscribe((data: ActionData<T>) => {
+        this.actionHistory.push(action);
         this.pushReactions(data);
       })
       .unsubscribe();
@@ -56,7 +53,7 @@ export class JStoreDispatcher<T> {
   }
 
   public on(action: Action<T>, fn: DestroyFn<T>): JStoreDispatcher<T> {
-    this.actionEvents.push({
+    this.actionListeners.push({
       name: action.name,
       fn: fn.bind(this)
     });
@@ -65,22 +62,25 @@ export class JStoreDispatcher<T> {
   }
 
   public restoreSnapshot(snapshotObject: Snapshot<T>): Snapshot<T> {
+    this.throwIfLock();
+
     const snapshot = this.snapshoter.restore(snapshotObject);
     const actions = snapshot.getActions();
-    actions.forEach((action: ActionInterface<T>) => {
-      this.actions.push(action);
-      this.store.dispatch(action.value);
+    actions.forEach((action: Action<T>) => {
+      this.actionHistory.push(action);
     });
+
+    this.runAction(actions[actions.length - 1]);
 
     return snapshot;
   }
 
   public makeSnapshot(name: string, clearActions: boolean = false): Snapshot<T> {
-    const actions = this.actions;
+    const actions = this.actionHistory;
     const snapshot = this.snapshoter.make(name, actions, this.store);
 
     if (clearActions) {
-      this.actions = [];
+      this.actionHistory = [];
     }
 
     return snapshot;
@@ -93,15 +93,10 @@ export class JStoreDispatcher<T> {
   }
 
   public lock(): JStoreDispatcher<T> {
-    if (this.isLock) {
-      throw new JStoreDispatcherError('Dispatcher locked');
-    }
+    this.throwIfLock();
 
     this.isLock = true;
-    this.actions.push({
-      name: this.NAME_LOCK,
-      value: null
-    });
+    this.actionHistory.push(this.LOCK_ACTION);
 
     return this;
   }
@@ -111,10 +106,7 @@ export class JStoreDispatcher<T> {
       throw new JStoreDispatcherError('Dispatcher unlocked');
     }
     this.isLock = false;
-    this.actions.push({
-      name: this.NAME_UNLOCK,
-      value: null
-    });
+    this.actionHistory.push(this.UNLOCK_ACTION);
 
     return this;
   }
@@ -130,19 +122,19 @@ export class JStoreDispatcher<T> {
     };
   }
 
-  private pushReactions(data: ReactionDataInterface<T>): void {
-    const length = this.actionEvents.length;
+  private pushReactions(data: ActionData<T>): void {
+    const length = this.actionListeners.length;
     for (let i = 0; i < length; ++i) {
-      const event = this.actionEvents[i];
+      const event = this.actionListeners[i];
       if (event.name === data.name) {
         event.fn.bind(this)(data.value, () => {
-          this.actionEvents.splice(i, 0);
+          this.actionListeners.splice(i, 0);
         });
       }
     }
   }
 
-  private runAction(action: Action<T>): Observable<ReactionDataInterface<T>> {
+  private runAction(action: Action<T>): Observable<ActionData<T>> {
     return (this.store[$$storage]() as Observable<T>)
       .pipe(
         map(value => action.fn.bind(this)(value)),
@@ -160,5 +152,11 @@ export class JStoreDispatcher<T> {
           return {name, value};
         })
       );
+  }
+
+  private throwIfLock() {
+    if (this.isLocked()) {
+      throw new JStoreDispatcherError('Dispatcher locked. Unlock to continue');
+    }
   }
 }

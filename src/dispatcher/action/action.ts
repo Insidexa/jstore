@@ -6,3 +6,8 @@ export interface Action<T> {
   name: string;
   fn: ActionFn<T>;
 }
+
+export interface ActionData<T> {
+  name: string;
+  value: T;
+}

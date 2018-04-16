@@ -1,10 +1,9 @@
 export { JStoreDispatcherError } from './dispatcher/dispatcher-locked.error';
 export { JStoreDispatcher } from './dispatcher/jstore-dispatcher';
-export { Action, ActionFn } from './dispatcher/action/action';
+export { Action, ActionFn, ActionData } from './dispatcher/action/action';
 export { SnapshotInterface } from './dispatcher/snapshot/snapshot.interface';
 export { Snapshot } from './dispatcher/snapshot/snapshot';
 export { Snapshoter } from './dispatcher/snapshot/snapshoter';
-export { ReactionDataInterface } from './dispatcher/reaction-data.interface';
 
 
 export { StrictTypeException } from './store/exceptions/strict-type.exception';

@@ -1,5 +1,5 @@
 import { Snapshot } from './snapshot';
-import { ActionInterface } from '../action/action.interface';
+import { Action } from '../action/action';
 import { $$clone, JStore } from '../../store/jstore';
 
 export class Snapshoter<T> {
@@ -23,7 +23,7 @@ export class Snapshoter<T> {
   }
 
   public make(name: string,
-              actions: Array<ActionInterface<T>>,
+              actions: Array<Action<T>>,
               store: JStore<T>) {
     const snapshot = new Snapshot(name, <JStore<T>>store[$$clone](), actions, new Date());
 

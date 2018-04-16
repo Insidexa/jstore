@@ -1,12 +1,12 @@
 import { Snapshoter } from './snapshot/snapshoter';
-import { ActionInterface } from './action/action.interface';
+import { Action } from './action/action';
 import { ActionEventInterface } from './action/action-event.interface';
 import { JStore } from '../store/jstore';
 
 export interface DispatcherStoreInterface<T> {
   store: JStore<T>;
   snapshoter: Snapshoter<T>;
-  actions: Array<ActionInterface<T>>;
+  actions: Array<Action<T>>;
   actionEvents: Array<ActionEventInterface<T>>;
 
   isLock: boolean;
