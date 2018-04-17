@@ -27,7 +27,7 @@ export class JStore<T> {
 
   private strict: boolean = true;
   private prevType: string;
-  private prevValue: T;
+  private currentValue: T;
 
   private context: RunContext = null;
 
@@ -46,7 +46,7 @@ export class JStore<T> {
       this.outputFormatters = outputFormatters;
       this.strict = strictTypeCheck;
       if (initValue) {
-        this.prevValue = initValue;
+        this.currentValue = initValue;
         this.prevType = getType(initValue);
         this.dispatch(initValue);
       }
@@ -66,6 +66,10 @@ export class JStore<T> {
   }
 
   public dispatch(value: T): Subscription {
+    if (this.store.isStopped) {
+      throw new Error('Dispatcher completed');
+    }
+
     const type = getType(value);
     const typeFail = this.strict && this.prevType && this.prevType !== type;
     if (typeFail) {
@@ -76,15 +80,14 @@ export class JStore<T> {
       return this.storage.set(formattedValue)
         .subscribe((storeValue: T) => {
           this.prevType = type;
-          this.prevValue = storeValue;
+          this.currentValue = value;
           this.runMaybeWithContext(storeValue);
         });
     });
   }
 
   public subscribe(next?: (value: T) => void, error?: (error: any) => void, complete?: () => void): Subscription {
-    return this.observable()
-      .subscribe(next, error, complete);
+    return this.observable().subscribe(next, error, complete);
   }
 
   public destroy(subscription?: Subscription): void {
@@ -109,18 +112,15 @@ export class JStore<T> {
     const inputFormatters = this.inputFormatters;
     const outputFormatters = this.outputFormatters;
     const strictTypeCheck = this.strict;
-    const initValue = this.config && this.config.initValue ? this.prevValue : null;
+    const initValue = this.currentValue;
 
     let config: StoreConfigInterface<T> = {
       storage,
       inputFormatters,
       outputFormatters,
-      strictTypeCheck
+      strictTypeCheck,
+      initValue
     };
-
-    if (initValue) {
-      config.initValue = initValue;
-    }
 
     return new JStore<T>(config);
   }
