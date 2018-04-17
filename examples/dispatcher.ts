@@ -29,10 +29,14 @@ export const testDispatcher = () => {
   storeNumber.dispatch(1);
 
   // destroy subscription (subscriptionNumber) and observable call complete
-  storeNumber.destroy(subscriptionNumber);
+  // storeNumber.destroy(subscriptionNumber);
 
-  // not work
-  storeNumber.dispatch(2);
+  // throw error if completed
+  /*try {
+    storeNumber.dispatch(2);
+  } catch (e) {
+    console.log(e);
+  }*/
 
 
   /**
@@ -46,37 +50,39 @@ export const testDispatcher = () => {
   const actionDec = JStoreDispatcher.makeAction<number>('dec', (value: number) => value - 1);
 
 // listener on action by action function
-  dispatcher.on(actionInc, (value: number, destroyFn: () => void) => {
-    console.log('on action {actionInc}: ', actionInc, value);
-    // destroy listener
-    destroyFn();
+  const listener = dispatcher.on(actionInc, (value: number) => {
+    console.log('on action {actionInc}: ', value);
   });
 
-  dispatcher.on(actionDec, (value: number, destroyFn: () => void) => {
-    console.log('on action {dec}: ', actionDec, value);
-    destroyFn();
-  });
-
-// snapshot with history & store, date, name
-  const snapshot1 = dispatcher.makeSnapshot('three');
-
-// restore snapshot with history, value
-  dispatcher.restoreSnapshot(snapshot1);
 
   dispatcher.action(actionInc);
+
+  // destroy listener
+  listener();
+
+  dispatcher.action(actionInc); // 3
+
+  // snapshot with history & store, date, name
+  const snapshot1 = dispatcher.makeSnapshot('three');
+
+  dispatcher.action(actionDec);
+
+  console.log('restore....');
+  // restore snapshot with history, value
+  dispatcher.restoreSnapshot(snapshot1);
 
   dispatcher.action(actionDec);
 
 
-  console.info('\nnew store');
+  console.info('new store');
   const storeNumber1 = new JStore<number>();
   storeNumber1.subscribe((value: number) => {
     console.log('storeNumber1', value);
   });
 
   const dispatcher1 = new JStoreDispatcher(storeNumber1);
-  console.info('restore from snapshot1');
 
+  console.info('restore from snapshot1');
 // restoring from another store
   dispatcher1.restoreSnapshot(snapshot1);
 
