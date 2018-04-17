@@ -2,14 +2,13 @@ import { Observable } from 'rxjs/Observable';
 import { map, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs/observable/of';
 
-import { $$storage, JStore } from '../store/jstore';
+import { JStore, $$storage } from '../store/jstore';
 import { Snapshot } from './snapshot/snapshot';
-import { ActionEventInterface } from './action/action-event.interface';
+import { ActionEvent } from './action/action-event.interface';
 import { Action, ActionFn, ActionData } from './action/action';
 import { Snapshoter } from './snapshot/snapshoter';
 import { JStoreDispatcherError } from './dispatcher-locked.error';
-
-type DestroyFn<T> = (value: T, destroy: () => void) => void;
+import { deepCopy } from '../deep-copy';
 
 /**
  * TODO: add store for store all snapshots & actions & store
@@ -22,12 +21,16 @@ type DestroyFn<T> = (value: T, destroy: () => void) => void;
  *       false -> action not called
  *       true -> called
  *
+ * TODO: fix snapshots
+ *
+ * TODO: .on return fn for destroy
+ *
  */
 export class JStoreDispatcher<T> {
 
   private snapshoter: Snapshoter<T> = new Snapshoter<T>();
-  private actionHistory: Array<Action<T>> = [];
-  private actionListeners: Array<ActionEventInterface<T>> = [];
+  private actionHistory: Array<ActionData<T>> = [];
+  private actionListeners: Array<ActionEvent<T>> = [];
   private isLock: boolean = false;
 
   private LOCK_ACTION: Action<T> = JStoreDispatcher.makeAction<null>('LOCK_ACTION$', () => null);
@@ -44,7 +47,7 @@ export class JStoreDispatcher<T> {
 
     this.runAction(action)
       .subscribe((data: ActionData<T>) => {
-        this.actionHistory.push(action);
+        this.actionHistory.push(data);
         this.pushReactions(data);
       })
       .unsubscribe();
@@ -52,13 +55,15 @@ export class JStoreDispatcher<T> {
     return this;
   }
 
-  public on(action: Action<T>, fn: DestroyFn<T>): JStoreDispatcher<T> {
+  public on(action: Action<T>, fn: (value: T) => void): () => void {
     this.actionListeners.push({
       name: action.name,
       fn: fn.bind(this)
     });
 
-    return this;
+    return () => {
+      this.actionListeners = this.actionListeners.filter((action: ActionEvent<T>) => action.name !== action.name)
+    };
   }
 
   public restoreSnapshot(snapshotObject: Snapshot<T>): Snapshot<T> {
@@ -66,17 +71,19 @@ export class JStoreDispatcher<T> {
 
     const snapshot = this.snapshoter.restore(snapshotObject);
     const actions = snapshot.getActions();
-    actions.forEach((action: Action<T>) => {
+    actions.forEach((action: ActionData<T>) => {
       this.actionHistory.push(action);
     });
 
-    this.runAction(actions[actions.length - 1]);
+    if (actions.length > 0) {
+      this.store.dispatch(actions[actions.length - 1].value);
+    }
 
     return snapshot;
   }
 
   public makeSnapshot(name: string, clearActions: boolean = false): Snapshot<T> {
-    const actions = this.actionHistory;
+    const actions = deepCopy<Array<ActionData<T>>>(this.actionHistory);
     const snapshot = this.snapshoter.make(name, actions, this.store);
 
     if (clearActions) {
@@ -142,14 +149,13 @@ export class JStoreDispatcher<T> {
           if (!(observableOrValue instanceof Observable)) {
             return of(observableOrValue);
           }
-
           return observableOrValue;
         }),
         map((value: T) => {
           this.store.dispatch(value);
-          const name = action.name;
+          const { name, fn } = action;
 
-          return {name, value};
+          return {name, value, fn};
         })
       );
   }

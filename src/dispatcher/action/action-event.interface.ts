@@ -1,4 +1,4 @@
-export interface ActionEventInterface<T> {
+export interface ActionEvent<T> {
   name: string;
   fn: (value: any) => any;
 }

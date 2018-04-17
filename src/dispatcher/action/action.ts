@@ -7,7 +7,6 @@ export interface Action<T> {
   fn: ActionFn<T>;
 }
 
-export interface ActionData<T> {
-  name: string;
-  value: T;
+export interface ActionData<T> extends Action<T> {
+  value?: T;
 }

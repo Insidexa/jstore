@@ -1,11 +1,11 @@
 import { JStore } from '../../store/jstore';
-import { Action } from '../action/action';
+import { ActionData } from '../action/action';
 
 export class Snapshot<T> {
 
   constructor(private readonly name: string,
               private readonly store: JStore<T>,
-              private readonly actions: Action<T>[],
+              private readonly actions: ActionData<T>[],
               private readonly date: Date) {
   }
 
@@ -17,7 +17,7 @@ export class Snapshot<T> {
     return this.store;
   }
 
-  public getActions(): Action<T>[] {
+  public getActions(): ActionData<T>[] {
     return this.actions;
   }
 
