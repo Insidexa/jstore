@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
 rm -rf ./bundle/
-npm run build
+yarn run build
 cp ./README.md ./bundle/
 cp ./package.json ./bundle/
