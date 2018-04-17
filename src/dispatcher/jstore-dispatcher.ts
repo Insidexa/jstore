@@ -21,10 +21,6 @@ import { deepCopy } from '../deep-copy';
  *       false -> action not called
  *       true -> called
  *
- * TODO: fix snapshots
- *
- * TODO: .on return fn for destroy
- *
  */
 export class JStoreDispatcher<T> {
 
