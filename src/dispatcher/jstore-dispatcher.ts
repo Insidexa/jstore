@@ -4,7 +4,7 @@ import { of } from 'rxjs/observable/of';
 
 import { JStore, $$storage } from '../store/jstore';
 import { Snapshot } from './snapshot/snapshot';
-import { ActionEvent } from './action/action-event.interface';
+import { ActionListener } from './action/action-event.interface';
 import { Action, ActionFn, ActionData } from './action/action';
 import { Snapshoter } from './snapshot/snapshoter';
 import { JStoreDispatcherError } from './dispatcher-locked.error';
@@ -26,7 +26,7 @@ export class JStoreDispatcher<T> {
 
   private snapshoter: Snapshoter<T> = new Snapshoter<T>();
   private actionHistory: Array<ActionData<T>> = [];
-  private actionListeners: Array<ActionEvent<T>> = [];
+  private actionListeners: Array<ActionListener<T>> = [];
   private isLock: boolean = false;
 
   private LOCK_ACTION: Action<T> = JStoreDispatcher.makeAction<null>('LOCK_ACTION$', () => null);
@@ -58,7 +58,7 @@ export class JStoreDispatcher<T> {
     });
 
     return () => {
-      this.actionListeners = this.actionListeners.filter((action: ActionEvent<T>) => action.name !== action.name)
+      this.actionListeners = this.actionListeners.filter((action: ActionListener<T>) => action.name !== action.name)
     };
   }
 
