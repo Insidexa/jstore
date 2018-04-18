@@ -76,14 +76,15 @@ export class JStore<T> {
       throw new StrictTypeException();
     }
 
-    return this.checkInputFormatters(value).subscribe((formattedValue) => {
-      return this.storage.set(formattedValue)
-        .subscribe((storeValue: T) => {
-          this.prevType = type;
-          this.currentValue = value;
-          this.runMaybeWithContext(storeValue);
-        });
-    });
+    return this.checkInputFormatters(value)
+      .pipe(
+        switchMap(formattedValue => this.storage.set(formattedValue))
+      )
+      .subscribe(storeValue => {
+        this.prevType = type;
+        this.currentValue = value;
+        this.runMaybeWithContext(storeValue);
+      });
   }
 
   public subscribe(next?: (value: T) => void, error?: (error: any) => void, complete?: () => void): Subscription {
