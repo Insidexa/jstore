@@ -89,12 +89,6 @@ export class JStoreDispatcher<T> {
     return snapshot;
   }
 
-  public clearSnapshots(snapshot?: Snapshot<T>): JStoreDispatcher<T> {
-    this.snapshoter.clear(snapshot);
-
-    return this;
-  }
-
   public lock(): JStoreDispatcher<T> {
     this.throwIfLock();
 
