@@ -1,5 +1,8 @@
 ### JStore - simple, flexible, reactive store
 
+#### Install
+`yarn add @jashkasoft/rx-jstore`
+
 #### JStore
  - Actions & Formatters
  - Initial value

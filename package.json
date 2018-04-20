@@ -7,7 +7,7 @@
   "scripts": {
     "serve": "./node_modules/.bin/webpack-dev-server --config webpack.config-dev.js --mode development --profile --open --port 8000 --inline --hot --progress --profile --colors --watch --content-base examples/",
     "build": "./node_modules/.bin/cross-env NODE_ENV=production webpack --mode production",
-    "publish": "./create-bundle.sh && npm publish ./bundle",
+    "publish": "./create-bundle.sh && npm publish ./bundle --access public",
     "lib": "yarn run build && yarn pack ./bundle"
   },
   "keywords": [
