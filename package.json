@@ -1,5 +1,5 @@
 {
-  "name": "jstore",
+  "name": "@jashkasoft/rx-jstore",
   "version": "0.0.1",
   "description": "JashkaStore - simple, flexible, reactive store",
   "main": "bundle/bundle.js",
@@ -7,7 +7,7 @@
   "scripts": {
     "serve": "./node_modules/.bin/webpack-dev-server --config webpack.config-dev.js --mode development --profile --open --port 8000 --inline --hot --progress --profile --colors --watch --content-base examples/",
     "build": "./node_modules/.bin/cross-env NODE_ENV=production webpack --mode production",
-    "publish": "./create-bundle.sh && yarn publish ./bundle",
+    "publish": "./create-bundle.sh && npm publish ./bundle",
     "lib": "yarn run build && yarn pack ./bundle"
   },
   "keywords": [
