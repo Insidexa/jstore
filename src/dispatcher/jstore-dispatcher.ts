@@ -58,7 +58,7 @@ export class JStoreDispatcher<T> {
     });
 
     return () => {
-      this.actionListeners = this.actionListeners.filter((action: ActionListener<T>) => action.name !== action.name)
+      this.actionListeners = this.actionListeners.filter((action: ActionListener<T>) => action.name !== action.name);
     };
   }
 

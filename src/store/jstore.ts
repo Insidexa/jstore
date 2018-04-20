@@ -12,6 +12,7 @@ import { StrictTypeException } from './exceptions/strict-type.exception';
 import { JStoreConfResolver } from './config-resolver';
 import { getType } from './get-type';
 import { RunContext } from './run-context';
+import { deepCopy } from '../deep-copy';
 
 export const $$storage = Symbol('$$storage');
 export const $$clone = Symbol('$$clone');
@@ -113,7 +114,7 @@ export class JStore<T> {
     const inputFormatters = this.inputFormatters;
     const outputFormatters = this.outputFormatters;
     const strictTypeCheck = this.strict;
-    const initValue = this.currentValue;
+    const initValue = deepCopy(this.currentValue);
 
     let config: StoreConfigInterface<T> = {
       storage,
