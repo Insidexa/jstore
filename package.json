@@ -16,8 +16,17 @@
     "rxjs",
     "reactive store"
   ],
-  "author": "JashkaSoft",
-  "license": "ISC",
+  "author": {
+    "name": "JashkaSoft",
+    "email": "jashkasoft@gmail.com",
+    "url": "https://github.com/Insidexa"
+  },,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Insidexa/jstore"
+  },
+  "homepage": "https://github.com/Insidexa/jstore",
   "dependencies": {
     "rxjs": "^5.5.6"
   },
