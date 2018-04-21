@@ -54,6 +54,7 @@ function example_initValue_formatters() {
 
   storeString.dispatch('a    ');
   storeString.dispatch('     b');
+
   storeString.dispatch('ac c');
   storeString.dispatch('asd');
   storeString.dispatch('    asdasd asd asd ');
