@@ -123,13 +123,6 @@ function example_strictStore() {
     console.log(e);
   }
 
-// check after store initial
-// error, prev type not equals to current
-  try {
-    storeNumberStrict.dispatch('');
-  } catch (e) {
-    console.error(e);
-  }
   console.groupEnd();
 }
 
