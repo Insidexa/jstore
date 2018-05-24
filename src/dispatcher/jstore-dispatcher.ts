@@ -17,12 +17,6 @@ import { Middleware } from './middleware/middleware';
  *
  * TODO: add filters for collection store
  *
- * TODO: add middleware with before
- *       before maybe with result: boolean
- *       before maybe pass value in action
- *       false -> action not called
- *       true -> called
- *
  */
 export class JStoreDispatcher<T> {
 
