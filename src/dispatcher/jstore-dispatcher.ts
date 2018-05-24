@@ -9,6 +9,8 @@ import { Action, ActionFn, ActionData } from './action/action';
 import { Snapshoter } from './snapshot/snapshoter';
 import { JStoreDispatcherError } from './dispatcher-locked.error';
 import { deepCopy } from '../deep-copy';
+import { Middleware } from './middleware/middleware';
+
 
 /**
  * TODO: add store for store all snapshots & actions & store
@@ -112,11 +114,18 @@ export class JStoreDispatcher<T> {
     return this.isLock;
   }
 
-  public static makeAction<T>(name: string, fn: ActionFn<T>): Action<T> {
-    return {
+  public static makeAction<T>(name: string, fn: ActionFn<T>, middleware: Middleware = null): Action<T> {
+    let action = {
       name,
-      fn
+      fn,
+      middleware
     };
+
+    if (middleware) {
+      action.middleware = middleware;
+    }
+
+    return action;
   }
 
   private pushReactions(data: ActionData<T>): void {
@@ -134,7 +143,16 @@ export class JStoreDispatcher<T> {
   private runAction(action: Action<T>): Observable<ActionData<T>> {
     return (this.store[$$storage]() as Observable<T>)
       .pipe(
-        map(value => action.fn.bind(this)(value)),
+        map(value => {
+          if (action.middleware) {
+            return action.middleware.next()
+              .pipe(
+                switchMap(middlewareData => action.fn.bind(this)(value, middlewareData))
+              );
+          } else {
+            return action.fn.bind(this)(value);
+          }
+        }),
         switchMap(observableOrValue => {
           if (!(observableOrValue instanceof Observable)) {
             return of(observableOrValue);
@@ -143,9 +161,9 @@ export class JStoreDispatcher<T> {
         }),
         map((value: T) => {
           this.store.dispatch(value);
-          const { name, fn } = action;
+          const {name, fn, middleware} = action;
 
-          return {name, value, fn};
+          return {name, value, fn, middleware};
         })
       );
   }

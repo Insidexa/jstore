@@ -4,7 +4,7 @@ export { Action, ActionFn, ActionData } from './dispatcher/action/action';
 export { SnapshotInterface } from './dispatcher/snapshot/snapshot.interface';
 export { Snapshot } from './dispatcher/snapshot/snapshot';
 export { Snapshoter } from './dispatcher/snapshot/snapshoter';
-
+export { Middleware } from './dispatcher/middleware/middleware';
 
 export { StrictTypeException } from './store/exceptions/strict-type.exception';
 export { FormatterInterface } from './store/formatter/formatter.interface';
