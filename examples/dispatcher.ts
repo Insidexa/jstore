@@ -4,10 +4,12 @@ import {
   ToNumberFormatter,
   ToStringFormatter,
   JStore,
-  JStoreDispatcher
+  JStoreDispatcher,
+  Middleware
 } from '../src/index';
 
 import { LocalStorage } from './stores/localstorage.store';
+import { Observable } from 'rxjs/Observable';
 
 export const testDispatcher = () => {
   console.group('JStoreDispatcher');
@@ -46,7 +48,25 @@ export const testDispatcher = () => {
 
 // named action with state, saved in history
 // action as function
-  const actionInc = JStoreDispatcher.makeAction<number>('inc', (value: number) => of(value + 1));
+
+  class AddMiddleware implements Middleware {
+    next(): Observable<boolean> {
+      const n = Math.floor(Math.random() * 10);
+      if (n % 2 === 0) {
+        throw new Error('n % 2 === 0');
+      }
+      return of(true);
+    }
+  }
+
+  const actionInc = JStoreDispatcher.makeAction<number>(
+    'inc',
+    (value: number, data: any) => {
+      console.log(value, data);
+      return of(value + 1);
+    },
+    new AddMiddleware()
+  );
   const actionDec = JStoreDispatcher.makeAction<number>('dec', (value: number) => value - 1);
 
 // listener on action by action function
