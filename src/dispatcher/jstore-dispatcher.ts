@@ -10,6 +10,7 @@ import { Snapshoter } from './snapshot/snapshoter';
 import { JStoreDispatcherError } from './dispatcher-locked.error';
 import { deepCopy } from '../deep-copy';
 import { Middleware } from './middleware/middleware';
+import { Subscription } from 'rxjs/Subscription';
 
 
 /**
@@ -106,6 +107,13 @@ export class JStoreDispatcher<T> {
 
   public isLocked(): boolean {
     return this.isLock;
+  }
+
+  public destroy(...subscriptions: Subscription[]) {
+    subscriptions.forEach((subscription: Subscription) => {
+      subscription.unsubscribe();
+    });
+    this.store.destroy();
   }
 
   public static makeAction<T>(name: string, fn: ActionFn<T>, middleware: Middleware = null): Action<T> {

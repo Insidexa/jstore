@@ -51,9 +51,9 @@ export const testDispatcher = () => {
     next<T>(data: MiddlewareData<T>): Observable<number> {
       const n = Math.floor(Math.random() * 10); // or http request
       console.log('data middleware', data, 'random number', n);
-      if (n % 2 === 0) {
+      /*if (n % 2 === 0) {
         throw new Error('n % 2 === 0');
-      }
+      }*/
       return of(n);
     }
   }
@@ -64,7 +64,7 @@ export const testDispatcher = () => {
     'inc',
     (value: number, data: any) => {
       console.log(value, data);
-      return of(value + 1);
+      return of(value + data);
     },
     new AddMiddleware()
   );
@@ -121,6 +121,8 @@ export const testDispatcher = () => {
 // unlock, try to unlock two or more - error
   dispatcher1.unlock();
   dispatcher1.action(actionInc);
+
+  dispatcher.destroy(subscriptionNumber);
 
   console.groupEnd();
 };
