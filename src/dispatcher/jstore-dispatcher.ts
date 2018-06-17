@@ -139,7 +139,7 @@ export class JStoreDispatcher<T> {
       .pipe(
         map(value => {
           if (action.middleware) {
-            return action.middleware.next()
+            return action.middleware.next<T>({ value, action })
               .pipe(
                 switchMap(middlewareData => action.fn.bind(this)(value, middlewareData))
               );

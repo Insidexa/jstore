@@ -1,15 +1,16 @@
 import { of } from 'rxjs/observable/of';
+import { Observable } from 'rxjs/Observable';
 
 import {
   ToNumberFormatter,
   ToStringFormatter,
   JStore,
   JStoreDispatcher,
-  Middleware
+  Middleware,
+  MiddlewareData
 } from '../src/index';
 
 import { LocalStorage } from './stores/localstorage.store';
-import { Observable } from 'rxjs/Observable';
 
 export const testDispatcher = () => {
   console.group('JStoreDispatcher');
@@ -46,19 +47,19 @@ export const testDispatcher = () => {
    */
   const dispatcher = new JStoreDispatcher(storeNumber);
 
-// named action with state, saved in history
-// action as function
-
   class AddMiddleware implements Middleware {
-    next(): Observable<boolean> {
-      const n = Math.floor(Math.random() * 10);
+    next<T>(data: MiddlewareData<T>): Observable<number> {
+      const n = Math.floor(Math.random() * 10); // or http request
+      console.log('data middleware', data, 'random number', n);
       if (n % 2 === 0) {
         throw new Error('n % 2 === 0');
       }
-      return of(true);
+      return of(n);
     }
   }
 
+  // named action with state, saved in history
+  // action as function
   const actionInc = JStoreDispatcher.makeAction<number>(
     'inc',
     (value: number, data: any) => {
