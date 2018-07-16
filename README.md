@@ -4,14 +4,202 @@
 `yarn add @jashkasoft/rx-jstore`
 
 #### JStore
- - Actions & Formatters
  - Initial value
+    ```typescript
+    import { JStore } from '@jashkasoft/rx-jstore';
+ 
+    const store = new JStore<string>({
+         initValue: 'string',
+    });
+
+    const subscription = store.subscribe((value: string) => {
+        console.log('store', value); // new str
+    });
+
+    store.dispatch('new str');
+
+    // complete store & unsubscribe
+    store.destroy(subscription);
+    ```
  - Custom input & output formatters ( Formatters are Observable )
+     
+    ```typescript
+    import { JStore, TrimFormatter, FormatterInterface } from '@jashkasoft/rx-jstore';   
+    import { of } from 'rxjs/observable/of';
+    import { Observable } from 'rxjs/Observable';
+    class TrimFormatter implements FormatterInterface {
+       public transform(str: string): Observable<string> {
+         return of(str.trim());
+       }
+     }
+    class StrEndOutputFormatter implements FormatterInterface {
+       public transform(str: string): Observable<string> {
+         return of(str + ' end of string');
+       }
+     }
+    const store = new JStore<string>({
+         inputFormatters: [
+            new TrimFormatter()
+         ],
+         outputFormatters: [
+            new StrEndOutputFormatter()
+         ]
+    });
+    const subscription = store.subscribe((value: string) => {
+        console.log('store', `'${value}'`); // 'new str end of string'
+    });
+    store.dispatch('      new str   ');
+    store.destroy(subscription);
+    ```
  - Custom storage
+    ```typescript
+    import { JStore, StorageInterface, FormatterInterface } from '@jashkasoft/rx-jstore';   
+    import { of } from 'rxjs/observable/of';
+    import { Observable } from 'rxjs/Observable';
+    import { map } from 'rxjs/operators';
+    
+    interface CustomObject {
+       name: string;
+       id: number;
+     }
+    
+    class LocalStorage<T> implements StorageInterface<T> {
+      constructor(private token: string = 'store') {
+      }
+    
+      public get(): Observable<any> {
+        return of(localStorage.getItem(this.token));
+      }
+    
+      public set(value: any): Observable<T | null> {
+        localStorage.setItem(this.token, value);
+        return of(value);
+      }
+    
+      public clear(): Observable<T | null> {
+        localStorage.removeItem(this.token);
+        return of(null);
+      }
+    
+    }
+    
+    class StringToJSONFormatter implements FormatterInterface {
+      public transform(str: string): Observable<any> {
+        return of(JSON.parse(str));
+      }
+    }
+ 
+    class JSONToStringFormatter implements FormatterInterface {
+      public transform(json: any): Observable<string> {
+        return of(json)
+          .pipe(
+            map(json => JSON.stringify(json))
+          );
+      }
+    }
+     
+    const store = new JStore<CustomObject>({
+      storage: new LocalStorage<CustomObject>(),
+      inputFormatters: [
+        new JSONToStringFormatter()
+      ],
+      outputFormatters: [
+        new StringToJSONFormatter()
+      ]
+    });
+     
+    const subscription = store.subscribe((value: CustomObject) => {
+      console.log('store', value);
+    });
+    
+    store.dispatch({
+      name: 'name',
+      id: 2
+    });
+    
+    store.destroy(subscription);
+    ```
  - Strict storage checking
+    ```typescript
+    const store = new JStore<any>({
+        strictTypeCheck: true,
+        initValue: '13'
+    });
+    
+    // ok, string type
+    store.dispatch('Hello, World!');
+    
+    // error if initValue type string
+    try {
+      store.dispatch(1123);
+    } catch (e) {
+      console.log(e);
+    }
+    ```
  - context run ( maybe with angularjs $scopeApply )
+    ```typescript
+    import { storeFactory } from '@jashkasoft/rx-jstore';   
+
+    const store = storeFactory<number>();
+    const sub = store.subscribe((n: number) => {
+      console.log('number', n);
+    });
+    store.changeContext(fn => $scopeApply(fn));
+    store.dispatch(100000000);
+    store.destroy(sub);
+    ```
+ - selector
+    ```typescript
+    import { JStore } from '@jashkasoft/rx-jstore';   
+ 
+    interface Obj {
+        name: string;
+        id: number;
+        extra: {
+          min: number;
+          max: number;
+        };
+    }
+    
+    const store = new JStore<Obj>();
+  
+    const subscription = store.subscribe((value: Obj) => {
+      console.log('store', value);
+    });
+  
+    store.dispatch({
+      name: 'name',
+      id: 2,
+      extra: {
+        min: 1,
+        max: 10
+      }
+    });
+    store.dispatch({
+      name: 'name',
+      id: 2,
+      extra: {
+        min: 50,
+        max: 100
+      }
+    });
+  
+    // selector, maybe reuse in other stores
+    function minValueSelector(value: Obj): number {
+      return value.extra.min;
+    }
+  
+    store.select<number>(minValueSelector).subscribe(value => {
+      console.log('selector min value', value);
+    });
+  
+    store.destroy(subscription);
+    ```
+
+#### 
 
 #### JStoreDispatcher over JStore
+ - Actions
  - Lock & unlock
  - Snapshots
  - Actions
