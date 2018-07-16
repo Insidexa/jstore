@@ -1,7 +1,7 @@
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
-import { switchMap, mergeScan, last } from 'rxjs/operators';
+import { switchMap, mergeScan, last, map, first, take } from 'rxjs/operators';
 import { of } from 'rxjs/observable/of';
 
 import { StorageInterface } from './storage/storage.interface';
@@ -101,6 +101,15 @@ export class JStore<T> {
         this.store.complete();
       })
       .unsubscribe();
+  }
+
+  public select<R>(selector: Function): Observable<R> {
+    return <Observable<R>>this.storage.get()
+      .pipe(
+        switchMap(this.checkOutputFormatters.bind(this)),
+        map((value: T) => selector(value)),
+        first()
+      );
   }
 
   /**

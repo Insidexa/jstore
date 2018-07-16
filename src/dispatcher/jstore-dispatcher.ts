@@ -29,7 +29,7 @@ export class JStoreDispatcher<T> {
   private LOCK_ACTION: Action<T> = JStoreDispatcher.makeAction<null>('LOCK_ACTION$', () => null);
   private UNLOCK_ACTION: Action<T> = JStoreDispatcher.makeAction<null>('UNLOCK_ACTION$', () => null);
 
-  constructor(private store?: JStore<T>) {
+  constructor(private store: JStore<T> = null) {
     if (!this.store) {
       this.store = new JStore<T>();
     }
@@ -57,6 +57,10 @@ export class JStoreDispatcher<T> {
     return () => {
       this.actionListeners = this.actionListeners.filter((action: ActionListener<T>) => action.name !== action.name);
     };
+  }
+
+  public select<R>(selector: Function): Observable<R> {
+    return this.store.select(selector);
   }
 
   public restoreSnapshot(snapshotObject: Snapshot<T>): Snapshot<T> {

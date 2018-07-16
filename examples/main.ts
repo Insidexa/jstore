@@ -148,6 +148,54 @@ function example_forkJoin() {
   console.groupEnd();
 }
 
+function example_selector() {
+  console.group('Example: selector');
+  interface Obj {
+    name: string;
+    id: number;
+    extra: {
+      min: number;
+      max: number;
+    };
+  }
+
+  const store = new JStore<Obj>();
+
+  const subscriptionLocalStorage = store.subscribe((value: Obj) => {
+    console.log('store', value);
+  });
+
+  store.dispatch({
+    name: 'name',
+    id: 2,
+    extra: {
+      min: 1,
+      max: 10
+    }
+  });
+  store.dispatch({
+    name: 'name',
+    id: 2,
+    extra: {
+      min: 50,
+      max: 100
+    }
+  });
+
+  // selector, maybe reuse in other stores
+  function minValueSelector(value: Obj): number {
+    return value.extra.min;
+  }
+
+  store.select<number>(minValueSelector).subscribe(value => {
+    console.log('selector min value', value);
+  });
+
+  store.destroy(subscriptionLocalStorage);
+  console.groupEnd();
+}
+
+
 console.group('JStore');
 
 
@@ -160,6 +208,8 @@ example_initValue_formatters();
 example_sessionStorage_formatter();
 
 example_strictStore();
+
+example_selector();
 
 
 console.groupEnd();

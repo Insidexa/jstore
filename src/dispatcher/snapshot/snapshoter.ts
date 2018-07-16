@@ -11,7 +11,7 @@ export class Snapshoter<T> {
     return snapshot;
   }
 
-  public clear(snapshot?: Snapshot<T>) {
+  public clear(snapshot: Snapshot<T> = null) {
     if (snapshot) {
       const name = snapshot.getName();
       this.removeSnapshot(name);

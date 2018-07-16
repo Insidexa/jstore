@@ -1,6 +1,6 @@
 {
   "name": "@jashkasoft/rx-jstore",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "JashkaStore - simple, flexible, reactive store",
   "main": "bundle/bundle.js",
   "types": "bundle/bundle.d.ts",
