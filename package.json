@@ -2,8 +2,8 @@
   "name": "@jashkasoft/rx-jstore",
   "version": "0.0.5",
   "description": "JashkaStore - simple, flexible, reactive store",
-  "main": "bundle/bundle.js",
-  "types": "bundle/bundle.d.ts",
+  "main": "bundle.js",
+  "types": "index.d.ts",
   "scripts": {
     "serve": "./node_modules/.bin/webpack-dev-server --config webpack.config-dev.js --mode development --profile --port 8000 --inline --hot --progress --profile --colors --watch --content-base examples/",
     "build": "./node_modules/.bin/cross-env NODE_ENV=production webpack --mode production",
