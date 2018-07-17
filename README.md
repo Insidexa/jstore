@@ -40,8 +40,8 @@
      
     ```typescript
     import { JStore, TrimFormatter, FormatterInterface } from '@jashkasoft/rx-jstore';   
-    import { of } from 'rxjs/observable/of';
-    import { Observable } from 'rxjs/Observable';
+    import { of, Observable } from 'rxjs';
+
     class TrimFormatter implements FormatterInterface {
        public transform(str: string): Observable<string> {
          return of(str.trim());
@@ -69,8 +69,7 @@
  - Custom storage
     ```typescript
     import { JStore, StorageInterface, FormatterInterface } from '@jashkasoft/rx-jstore';   
-    import { of } from 'rxjs/observable/of';
-    import { Observable } from 'rxjs/Observable';
+    import { of, Observable } from 'rxjs';
     import { map } from 'rxjs/operators';
     
     interface CustomObject {
@@ -151,15 +150,20 @@
       console.log(e);
     }
     ```
- - context run ( maybe with angularjs $scopeApply )
+ - context run
     ```typescript
-    import { storeFactory } from '@jashkasoft/rx-jstore';   
+    import { storeFactory, RunContext } from '@jashkasoft/rx-jstore';   
 
     const store = storeFactory<number>();
     const sub = store.subscribe((n: number) => {
       console.log('number', n);
     });
-    store.changeContext(fn => $scopeApply(fn));
+ 
+    function youContext(fn: Function) {
+     fn();
+    }
+ 
+    store.changeContext((fn: RunContext) => youContext(fn));
     store.dispatch(100000000);
     store.destroy(sub);
     ```
@@ -215,8 +219,7 @@
 
 #### JStoreDispatcher over JStore
 ```typescript
-import { of } from 'rxjs/observable/of';
-import { Observable } from 'rxjs/Observable';
+import { of, Observable } from 'rxjs';
 
 import {
   ToNumberFormatter,

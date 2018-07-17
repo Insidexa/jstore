@@ -7,7 +7,7 @@ import {
   JStoreDispatcher,
   Middleware,
   MiddlewareData
-} from '@jashkasoft/rx-jstore';
+} from '../src/index';
 
 import { LocalStorage } from './stores/localstorage.store';
 

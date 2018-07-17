@@ -1,6 +1,6 @@
 import { Observable, from } from 'rxjs';
 
-import { StorageInterface } from '@jashkasoft/rx-jstore';
+import { StorageInterface } from '../../src/index';
 
 /**
  * Http storage created with promises for sync with backend

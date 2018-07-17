@@ -1,6 +1,6 @@
 import { of, Observable } from 'rxjs';
 
-import { StorageInterface } from '@jashkasoft/rx-jstore';
+import { StorageInterface } from '../../src/index';
 
 export class LocalStorage<T> implements StorageInterface<T> {
   constructor(private token: string = 'store') {

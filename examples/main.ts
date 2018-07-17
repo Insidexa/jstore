@@ -4,13 +4,13 @@ import {
   JStore,
   storeFactory,
   TrimFormatter,
-} from '@jashkasoft/rx-jstore';
+  RunContext,
+} from '../src/index';
 
 import { LocalStorage } from './stores/localstorage.store';
 import { JSONToStringFormatter } from './formatters/json-to-string.formatter';
 import { StringToJSONFormatter } from './formatters/string-to-json.formatter';
 import { testDispatcher } from './dispatcher';
-
 
 function example_storeFactory_context_number() {
   console.group('Example: storeFactory, context with number');
@@ -21,14 +21,12 @@ function example_storeFactory_context_number() {
   const sub = store.subscribe((n: number) => {
     console.log('number', n);
   });
-  store.changeContext((fn) => {
-    function $scopeApply(fn: Function) {
-      console.log(`example, run in 'angular context'`);
-      fn();
-    }
 
-    $scopeApply(fn);
-  });
+  function youContext(fn: Function) {
+    fn();
+  }
+
+  store.changeContext((fn: RunContext) => youContext(fn));
   store.dispatch(100000000);
   store.destroy(sub);
 
