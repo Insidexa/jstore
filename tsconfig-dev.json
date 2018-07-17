@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "outDir": "./examples/dist/",
     "sourceMap": true,
     "noImplicitAny": true,
     "module": "commonjs",
     "lib": [ "es2015", "dom" ],
-    "target": "es5",
-    "allowJS": true
+    "target": "es5"
   },
   "exclude": [
     "bundle/**/*",

@@ -1,11 +1,11 @@
 {
   "name": "@jashkasoft/rx-jstore",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "JashkaStore - simple, flexible, reactive store",
   "main": "bundle.js",
   "types": "index.d.ts",
   "scripts": {
-    "serve": "./node_modules/.bin/webpack-dev-server --config webpack.config-dev.js --mode development --profile --port 8000 --inline --hot --progress --profile --colors --watch --content-base examples/",
+    "serve": "./node_modules/.bin/cross-env NODE_ENV=development ./node_modules/.bin/webpack-serve ./webpack.config.js",
     "build": "./node_modules/.bin/cross-env NODE_ENV=production webpack --mode production",
     "publish": "./create-bundle.sh && npm publish ./bundle --access public",
     "lib": "yarn run build && yarn pack ./bundle"
@@ -28,19 +28,19 @@
   },
   "homepage": "https://github.com/Insidexa/jstore",
   "dependencies": {
-    "rxjs": "^5.5.6"
+    "rxjs": "^6.2.2"
   },
   "devDependencies": {
     "@types/node": "7.0.0",
-    "awesome-typescript-loader": "^5.0.0",
     "cross-env": "^5.1.1",
     "html-webpack-plugin": "^3.2.0",
     "source-map-loader": "^0.1.6",
+    "ts-loader": "^4.4.2",
     "tslint": "5.9.1",
     "tslint-loader": "3.6.0",
-    "typescript": "^2.7.1",
-    "webpack": "^4.5.0",
+    "typescript": "^2.9.2",
+    "webpack": "^4.16.1",
     "webpack-cli": "^2.0.14",
-    "webpack-dev-server": "^3.1.3"
+    "webpack-serve": "^2.0.2"
   }
 }

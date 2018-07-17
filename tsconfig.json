@@ -1,18 +1,23 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "outDir": "./bundle/",
     "declaration": true,
     "sourceMap": true,
     "noImplicitAny": true,
     "module": "commonjs",
+    "moduleResolution": "node",
     "lib": [ "es2015" ],
-    "target": "es5"
+    "target": "es5",
+    "typeRoots": [
+      "node_modules/@types"
+    ]
   },
   "include": [
     "src/**/*"
   ],
   "exclude": [
     "examples/**/*",
-    "bundle/**/*"
+    "node_modules "
   ]
 }
