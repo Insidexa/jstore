@@ -32,7 +32,7 @@ export class JStore<T> {
 
   private context: RunContext = null;
 
-  constructor(private config?: StoreConfigInterface<T>) {
+  constructor(private config: StoreConfigInterface<T> = null) {
     if (config) {
       const {
         storage,
@@ -92,7 +92,7 @@ export class JStore<T> {
     return this.observable().subscribe(next, error, complete);
   }
 
-  public destroy(subscription?: Subscription): void {
+  public destroy(subscription: Subscription = null): void {
     return this.storage.clear()
       .subscribe(() => {
         if (subscription) {

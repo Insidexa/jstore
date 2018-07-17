@@ -4,7 +4,22 @@
 `yarn add @jashkasoft/rx-jstore`
 
 #### JStore
- - Initial value
+ - initValue only condition check `if` operator
+ - clone with last value only if jstore has config property initial value
+ - formatters run with priority by index ( prev value passed to next formatter )
+   return last formatted value
+ - middleware
+   
+ - Base:
+     formatters:
+         - to number
+         - to string
+         - trim
+     storage:
+         - simple storage ( in memory )
+     
+##### Examples
+- Initial value
     ```typescript
     import { JStore } from '@jashkasoft/rx-jstore';
  
@@ -13,7 +28,7 @@
     });
 
     const subscription = store.subscribe((value: string) => {
-        console.log('store', value); // new str
+        console.log('store', value); // string and after new str
     });
 
     store.dispatch('new str');
@@ -196,37 +211,135 @@
     store.destroy(subscription);
     ```
 
-#### 
+##
 
 #### JStoreDispatcher over JStore
+```typescript
+import { of } from 'rxjs/observable/of';
+import { Observable } from 'rxjs/Observable';
+
+import {
+  ToNumberFormatter,
+  ToStringFormatter,
+  JStore,
+  JStoreDispatcher,
+  Middleware,
+  MiddlewareData
+} from '@jashkasoft@rx-jstore';
+
+const storeNumber = new JStore<number>({
+  storage: new LocalStorage<number>('number'),
+  inputFormatters: [
+    new ToStringFormatter()
+  ],
+  outputFormatters: [
+    new ToNumberFormatter()
+  ]
+});
+const subscriptionNumber = storeNumber.subscribe((value: number) => {
+  console.log('storeNumber', value);
+});
+
+
+storeNumber.dispatch(1);
+
+
+// destroy subscription (subscriptionNumber) and observable call complete
+// storeNumber.destroy(subscriptionNumber);
+// throw error if completed
+/*try {
+  storeNumber.dispatch(2);
+} catch (e) {
+  console.log(e);
+}*/
+```
  - Actions
+    ```typescript
+    const dispatcher = new JStoreDispatcher(storeNumber);
+    const actionInc = JStoreDispatcher.makeAction<number>(
+      'inc',
+      (value: number) => {
+        return of(value + 1);
+      }
+    );
+    const actionDec = JStoreDispatcher.makeAction<number>('dec', (value: number) => value - 1);
+    
+    // listener on action by action function
+    const listener = dispatcher.on(actionInc, (value: number) => {
+      console.log('on action {actionInc}: ', value);
+    });
+    
+    dispatcher.action(actionInc);
+    
+    // destroy listener
+    listener();
+    
+    dispatcher.action(actionInc); // 3
+ 
+    dispatcher.destroy(subscriptionNumber);
+    ```
  - Lock & unlock
+    ```typescript
+    // lock dispatcher, another actions disable, throw error
+    console.log('lock dispatcher1');
+    dispatcher.lock();
+    try {
+      // error
+      dispatcher.action(actionInc);
+    } catch (e) {
+      console.log(e);
+    }
+    // unlock, try to unlock two or more - error
+    dispatcher.unlock();
+    
+    dispatcher.action(actionInc);
+    ```
  - Snapshots
- - Actions
- - Action middleware
-
-
-#### Examples
-    examples/main.ts - JStore
-    examples/dispatcher.ts - JStoreDispatcher
-    examples/stores - How create custom store
-    examples/formatters - How create formatter
-
-
-##### JStore
-    - initValue only condition check `if` operator
-    - clone with last value only if jstore has config property initial value
-    - formatters run with priority by index ( prev value passed to next formatter )
-      return last formatted value
-    - middleware
-      
-    - Base:
-        formatters:
-            - to number
-            - to string
-            - trim
-        storage:
-            - simple storage ( in memory )
+    ```typescript
+    // snapshot with history & store, date, name
+    const snapshot1 = dispatcher.makeSnapshot('three');
+    
+    dispatcher.action(actionDec);
+    
+    console.log('restore....');
+    // restore snapshot with history, value
+    dispatcher.restoreSnapshot(snapshot1);
+    
+    dispatcher.action(actionDec);
+    ```
+ - Middleware
+    ```typescript
+    const dispatcher = new JStoreDispatcher(storeNumber);
+    class AddMiddleware implements Middleware {
+      public next<T>(data: MiddlewareData<T>): Observable<number> {
+        const n = Math.floor(Math.random() * 10); // or http request
+        console.log('data middleware', data, 'random number', n);
+        /*if (n % 2 === 0) {
+          throw new Error('n % 2 === 0');
+        }*/
+        return of(n);
+      }
+    }
+    // named action with state, saved in history
+    // action as function
+    const actionInc = JStoreDispatcher.makeAction<number>(
+      'inc',
+      (value: number, data: any) => {
+        console.log(value, data);
+        return of(value + data);
+      },
+      new AddMiddleware()
+    );
+    const actionDec = JStoreDispatcher.makeAction<number>('dec', (value: number) => value - 1);
+    
+    // listener on action by action function
+    const listener = dispatcher.on(actionInc, (value: number) => {
+      console.log('on action {actionInc}: ', value);
+    });
+ 
+    // destroy listener
+    listener();
+    ```
 
 
 

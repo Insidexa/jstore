@@ -70,7 +70,7 @@ export const testDispatcher = () => {
   );
   const actionDec = JStoreDispatcher.makeAction<number>('dec', (value: number) => value - 1);
 
-// listener on action by action function
+  // listener on action by action function
   const listener = dispatcher.on(actionInc, (value: number) => {
     console.log('on action {actionInc}: ', value);
   });
@@ -104,10 +104,10 @@ export const testDispatcher = () => {
   const dispatcher1 = new JStoreDispatcher(storeNumber1);
 
   console.info('restore from snapshot1');
-// restoring from another store
+  // restoring from another store
   dispatcher1.restoreSnapshot(snapshot1);
 
-// lock dispatcher, another actions disable, throw error
+  // lock dispatcher, another actions disable, throw error
   console.log('lock dispatcher1');
   dispatcher1.lock();
 
@@ -118,7 +118,7 @@ export const testDispatcher = () => {
     console.log(e);
   }
 
-// unlock, try to unlock two or more - error
+  // unlock, try to unlock two or more - error
   dispatcher1.unlock();
   dispatcher1.action(actionInc);
 
