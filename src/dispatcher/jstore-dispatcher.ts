@@ -1,6 +1,5 @@
-import { Observable } from 'rxjs/Observable';
 import { map, switchMap } from 'rxjs/operators';
-import { of } from 'rxjs/observable/of';
+import { of, Observable, Subscription } from 'rxjs';
 
 import { JStore, $$storage } from '../store/jstore';
 import { Snapshot } from './snapshot/snapshot';
@@ -10,7 +9,6 @@ import { Snapshoter } from './snapshot/snapshoter';
 import { JStoreDispatcherError } from './dispatcher-locked.error';
 import { deepCopy } from '../deep-copy';
 import { Middleware } from './middleware/middleware';
-import { Subscription } from 'rxjs/Subscription';
 
 
 /**

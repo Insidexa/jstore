@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 export interface StorageInterface<T> {
   get (): Observable<T>;

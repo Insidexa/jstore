@@ -1,5 +1,4 @@
-import { of } from 'rxjs/observable/of';
-import { Observable } from 'rxjs/Observable';
+import { of, Observable } from 'rxjs';
 
 import {
   ToNumberFormatter,
@@ -8,7 +7,7 @@ import {
   JStoreDispatcher,
   Middleware,
   MiddlewareData
-} from '../src/index';
+} from '@jashkasoft/rx-jstore';
 
 import { LocalStorage } from './stores/localstorage.store';
 

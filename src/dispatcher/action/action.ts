@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { Middleware } from '../middleware/middleware';
 
 export type ActionFn<T> = (value: T, middlewareData?: any) => Observable<T> | T;

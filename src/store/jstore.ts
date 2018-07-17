@@ -1,8 +1,5 @@
-import { Subject } from 'rxjs/Subject';
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
-import { switchMap, mergeScan, last, map, first, take } from 'rxjs/operators';
-import { of } from 'rxjs/observable/of';
+import { switchMap, mergeScan, last, map, first } from 'rxjs/operators';
+import { of, Subject, Observable, Subscription } from 'rxjs';
 
 import { StorageInterface } from './storage/storage.interface';
 import { SimpleStorage } from './storage/simple.storage';

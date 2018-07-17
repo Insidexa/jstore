@@ -1,5 +1,4 @@
-import { of } from 'rxjs/observable/of';
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 
 import { FormatterInterface } from './formatter.interface';
 

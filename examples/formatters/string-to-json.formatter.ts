@@ -1,7 +1,6 @@
-import { of } from 'rxjs/observable/of';
-import { Observable } from 'rxjs/Observable';
+import { of, Observable } from 'rxjs';
 
-import { FormatterInterface } from '../../src/index';
+import { FormatterInterface } from '@jashkasoft/rx-jstore';
 
 export class StringToJSONFormatter implements FormatterInterface {
   public transform(str: string): Observable<any> {

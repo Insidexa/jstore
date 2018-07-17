@@ -1,10 +1,10 @@
-import { forkJoin } from 'rxjs/observable/forkJoin';
+import { forkJoin } from 'rxjs';
 
 import {
   JStore,
   storeFactory,
   TrimFormatter,
-} from '../src/index';
+} from '@jashkasoft/rx-jstore';
 
 import { LocalStorage } from './stores/localstorage.store';
 import { JSONToStringFormatter } from './formatters/json-to-string.formatter';
