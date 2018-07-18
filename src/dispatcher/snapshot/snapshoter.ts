@@ -1,6 +1,6 @@
 import { Snapshot } from './snapshot';
 import { ActionData } from '../action/action';
-import { $$clone, JStore } from '../../store/jstore';
+import { JStore } from '../../store/jstore';
 
 export class Snapshoter<T> {
   private snapshots: Array<Snapshot<T>> = [];
@@ -25,7 +25,7 @@ export class Snapshoter<T> {
   public make(name: string,
               actions: Array<ActionData<T>>,
               store: JStore<T>) {
-    const snapshot = new Snapshot(name, <JStore<T>>store[$$clone](), actions, new Date());
+    const snapshot = new Snapshot(name, store.clone(), actions, new Date());
 
     this.snapshots.push(snapshot);
 

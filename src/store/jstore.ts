@@ -12,7 +12,6 @@ import { RunContext } from './run-context';
 import { deepCopy } from '../deep-copy';
 
 export const $$storage = Symbol('$$storage');
-export const $$clone = Symbol('$$clone');
 
 export class JStore<T> {
   private store: Subject<T> = new Subject<T>();
@@ -109,11 +108,7 @@ export class JStore<T> {
       );
   }
 
-  /**
-   * Ony for JStoreDispatcher
-   *
-   */
-  public [$$clone](): JStore<T> {
+  public clone(): JStore<T> {
     const prototype = Object.getPrototypeOf(this.storage);
     const store = Object.create(prototype);
     const storage = Object.assign(store, this.storage);
@@ -122,7 +117,7 @@ export class JStore<T> {
     const strictTypeCheck = this.strict;
     const initValue = deepCopy(this.currentValue);
 
-    let config: StoreConfigInterface<T> = {
+    const config: StoreConfigInterface<T> = {
       storage,
       inputFormatters,
       outputFormatters,

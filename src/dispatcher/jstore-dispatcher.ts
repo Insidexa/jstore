@@ -10,13 +10,6 @@ import { JStoreDispatcherError } from './dispatcher-locked.error';
 import { deepCopy } from '../deep-copy';
 import { Middleware } from './middleware/middleware';
 
-
-/**
- * TODO: add store for store all snapshots & actions & store
- *
- * TODO: add filters for collection store
- *
- */
 export class JStoreDispatcher<T> {
 
   private snapshoter: Snapshoter<T> = new Snapshoter<T>();
