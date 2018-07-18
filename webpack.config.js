@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const htmlWebpackPlugin = require('html-webpack-plugin');
+const pkg = require('./package.json');
 
 const isProduction = process.env.NODE_ENV !== 'development';
 
@@ -94,11 +95,14 @@ const webpackConfig = {
 
     output: {
         filename: '[name].js',
-        path: path.resolve( __dirname, config.destination )
+        path: path.resolve( __dirname, config.destination ),
+        library: pkg.name,
+        libraryTarget: 'umd',
+        umdNamedDefine: true
     },
 
     resolve: {
-        extensions: ['.ts', '.js'],
+        extensions: ['.ts', '.js', '.json'],
         modules: [
             ROOT,
             'node_modules'
