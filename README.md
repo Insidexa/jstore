@@ -9,6 +9,7 @@
  - formatters run with priority by index ( prev value passed to next formatter )
    return last formatted value
  - middleware
+ - snapshot ( current state if exists )
    
  - Base:
      formatters:
@@ -26,6 +27,8 @@
     const store = new JStore<string>({
          initValue: 'string',
     });
+  
+    console.log('snapshot with value', store.snapshot());
 
     const subscription = store.subscribe((value: string) => {
         console.log('store', value); // string and after new str

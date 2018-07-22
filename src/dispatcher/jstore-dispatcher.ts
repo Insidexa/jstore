@@ -111,6 +111,10 @@ export class JStoreDispatcher<T> {
     this.store.destroy();
   }
 
+  public getStoreSnapshot(): T | null {
+    return this.store.snapshot();
+  }
+
   public static makeAction<T>(name: string, fn: ActionFn<T>, middleware: Middleware = null): Action<T> {
     const action: Action<T> = {
       name,

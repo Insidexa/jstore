@@ -28,6 +28,9 @@ function example_storeFactory_context_number() {
 
   store.changeContext((fn: RunContext) => youContext(fn));
   store.dispatch(100000000);
+
+  console.log('snapshot with value', store.snapshot());
+
   store.destroy(sub);
 
   console.groupEnd();

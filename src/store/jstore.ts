@@ -24,7 +24,7 @@ export class JStore<T> {
 
   private strict: boolean = true;
   private prevType: string;
-  private currentValue: T;
+  private currentValue: T | null = null;
 
   private context: RunContext = null;
 
@@ -106,6 +106,10 @@ export class JStore<T> {
         map((value: T) => selector(value)),
         first()
       );
+  }
+
+  public snapshot(): T | null {
+    return this.currentValue;
   }
 
   public clone(): JStore<T> {
