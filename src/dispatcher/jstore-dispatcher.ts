@@ -26,10 +26,10 @@ export class JStoreDispatcher<T> {
     }
   }
 
-  public action(action: Action<T>): JStoreDispatcher<T> {
+  public action(action: Action<T>, payload: any): JStoreDispatcher<T> {
     this.throwIfLock();
 
-    this.runAction(action)
+    this.runAction(action, payload)
       .subscribe((data: ActionData<T>) => {
         this.actionHistory.push(data);
         this.pushReactions(data);
@@ -112,7 +112,7 @@ export class JStoreDispatcher<T> {
   }
 
   public static makeAction<T>(name: string, fn: ActionFn<T>, middleware: Middleware = null): Action<T> {
-    let action = {
+    const action: Action<T> = {
       name,
       fn,
       middleware
@@ -137,17 +137,17 @@ export class JStoreDispatcher<T> {
     }
   }
 
-  private runAction(action: Action<T>): Observable<ActionData<T>> {
+  private runAction(action: Action<T>, payload: any): Observable<ActionData<T>> {
     return (this.store[$$storage]() as Observable<T>)
       .pipe(
         map(value => {
           if (action.middleware) {
             return action.middleware.next<T>({ value, action })
               .pipe(
-                switchMap(middlewareData => action.fn.bind(this)(value, middlewareData))
+                switchMap(middlewareData => action.fn.bind(this)(value, payload, middlewareData))
               );
           } else {
-            return action.fn.bind(this)(value);
+            return action.fn.bind(this)(value, payload);
           }
         }),
         switchMap(observableOrValue => {

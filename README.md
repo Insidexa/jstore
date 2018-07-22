@@ -261,23 +261,23 @@ storeNumber.dispatch(1);
     const dispatcher = new JStoreDispatcher(storeNumber);
     const actionInc = JStoreDispatcher.makeAction<number>(
       'inc',
-      (value: number) => {
-        return of(value + 1);
+      (state: number, payload: number) => {
+        return of(state + payload);
       }
     );
-    const actionDec = JStoreDispatcher.makeAction<number>('dec', (value: number) => value - 1);
+    const actionDec = JStoreDispatcher.makeAction<number>('dec', (state: number, payload: number) => state - payload);
     
     // listener on action by action function
     const listener = dispatcher.on(actionInc, (value: number) => {
       console.log('on action {actionInc}: ', value);
     });
     
-    dispatcher.action(actionInc);
+    dispatcher.action(actionInc, 1);
     
     // destroy listener
     listener();
     
-    dispatcher.action(actionInc); // 3
+    dispatcher.action(actionInc, 1); // 3
  
     dispatcher.destroy(subscriptionNumber);
     ```
@@ -288,27 +288,27 @@ storeNumber.dispatch(1);
     dispatcher.lock();
     try {
       // error
-      dispatcher.action(actionInc);
+      dispatcher.action(actionInc, 1);
     } catch (e) {
       console.log(e);
     }
     // unlock, try to unlock two or more - error
     dispatcher.unlock();
     
-    dispatcher.action(actionInc);
+    dispatcher.action(actionInc, 1);
     ```
  - Snapshots
     ```typescript
     // snapshot with history & store, date, name
     const snapshot1 = dispatcher.makeSnapshot('three');
     
-    dispatcher.action(actionDec);
+    dispatcher.action(actionDec, 1);
     
     console.log('restore....');
     // restore snapshot with history, value
     dispatcher.restoreSnapshot(snapshot1);
     
-    dispatcher.action(actionDec);
+    dispatcher.action(actionDec, 1);
     ```
  - Middleware
     ```typescript
@@ -316,7 +316,6 @@ storeNumber.dispatch(1);
     class AddMiddleware implements Middleware {
       public next<T>(data: MiddlewareData<T>): Observable<number> {
         const n = Math.floor(Math.random() * 10); // or http request
-        console.log('data middleware', data, 'random number', n);
         /*if (n % 2 === 0) {
           throw new Error('n % 2 === 0');
         }*/
@@ -327,13 +326,13 @@ storeNumber.dispatch(1);
     // action as function
     const actionInc = JStoreDispatcher.makeAction<number>(
       'inc',
-      (value: number, data: any) => {
-        console.log(value, data);
-        return of(value + data);
+      (state: number, payload: number, middlewareData: any) => {
+        console.log('random number', middlewareData);
+        return of(state + payload);
       },
       new AddMiddleware()
     );
-    const actionDec = JStoreDispatcher.makeAction<number>('dec', (value: number) => value - 1);
+    const actionDec = JStoreDispatcher.makeAction<number>('dec', (state: number, payload: number) => state - payload);
     
     // listener on action by action function
     const listener = dispatcher.on(actionInc, (value: number) => {

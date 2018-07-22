@@ -61,13 +61,13 @@ export const testDispatcher = () => {
   // action as function
   const actionInc = JStoreDispatcher.makeAction<number>(
     'inc',
-    (value: number, data: any) => {
-      console.log(value, data);
-      return of(value + data);
+    (state: number, payload: any, middlewareData: number) => {
+      console.log('random number', middlewareData);
+      return of(state + payload);
     },
     new AddMiddleware()
   );
-  const actionDec = JStoreDispatcher.makeAction<number>('dec', (value: number) => value - 1);
+  const actionDec = JStoreDispatcher.makeAction<number>('dec', (state: number, payload: number) => state - payload);
 
   // listener on action by action function
   const listener = dispatcher.on(actionInc, (value: number) => {
@@ -75,23 +75,23 @@ export const testDispatcher = () => {
   });
 
 
-  dispatcher.action(actionInc);
+  dispatcher.action(actionInc, 1);
 
   // destroy listener
   listener();
 
-  dispatcher.action(actionInc); // 3
+  dispatcher.action(actionInc, 1); // 3
 
   // snapshot with history & store, date, name
   const snapshot1 = dispatcher.makeSnapshot('three');
 
-  dispatcher.action(actionDec);
+  dispatcher.action(actionDec, 1);
 
   console.log('restore....');
   // restore snapshot with history, value
   dispatcher.restoreSnapshot(snapshot1);
 
-  dispatcher.action(actionDec);
+  dispatcher.action(actionDec, 1);
 
 
   console.info('new store');
@@ -112,14 +112,14 @@ export const testDispatcher = () => {
 
   try {
     // error
-    dispatcher1.action(actionInc);
+    dispatcher1.action(actionInc, 1);
   } catch (e) {
     console.log(e);
   }
 
   // unlock, try to unlock two or more - error
   dispatcher1.unlock();
-  dispatcher1.action(actionInc);
+  dispatcher1.action(actionInc, 1);
 
   dispatcher.destroy(subscriptionNumber);
 
