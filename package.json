@@ -1,12 +1,12 @@
 {
   "name": "@jashkasoft/rx-jstore",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "JashkaStore - simple, flexible, reactive store",
   "main": "bundle.js",
   "types": "index.d.ts",
   "scripts": {
-    "serve": "./node_modules/.bin/cross-env NODE_ENV=development ./node_modules/.bin/webpack-serve ./webpack.config.js",
-    "build": "./node_modules/.bin/cross-env NODE_ENV=production webpack --mode production",
+    "serve": "node ./node_modules/.bin/cross-env NODE_ENV=development node ./node_modules/.bin/webpack-serve ./webpack.config.js",
+    "build": "node ./node_modules/.bin/cross-env NODE_ENV=production node ./node_modules/.bin/webpack --mode production",
     "publish": "./create-bundle.sh && npm publish ./bundle --access public",
     "lib": "yarn run build && npm pack ./bundle/"
   },
